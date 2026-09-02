@@ -13,7 +13,9 @@ from pathlib import Path
 
 RUNTIME_ENTRIES = ("SKILL.md", "agents", "references", "assets", "scripts")
 SKILL_NAME = "laoma-aigc-director"
-_EXCLUDED_DIRECTORY_NAMES = {".git", "tests", "docs", "__pycache__"}
+_EXCLUDED_DIRECTORY_NAMES = frozenset(
+    name.casefold() for name in {".git", "tests", "docs", "__pycache__"}
+)
 
 
 def _copy_runtime_entry(source: Path, staging: Path, entry: str) -> None:
@@ -28,7 +30,7 @@ def _copy_runtime_entry(source: Path, staging: Path, entry: str) -> None:
 
     for path in sorted(source_entry.rglob("*")):
         relative = path.relative_to(source)
-        if any(part in _EXCLUDED_DIRECTORY_NAMES for part in relative.parts):
+        if any(part.casefold() in _EXCLUDED_DIRECTORY_NAMES for part in relative.parts):
             continue
         target = staging / relative
         if path.is_dir():
@@ -59,6 +61,11 @@ def _write_manifest(staging: Path) -> None:
     )
 
 
+def _paths_overlap(first: Path, second: Path) -> bool:
+    """Return whether either resolved path contains the other."""
+    return first == second or first in second.parents or second in first.parents
+
+
 def sync_skill(source: Path, destination_root: Path, replace: bool = False) -> Path:
     """Install a staged, hash-manifested runtime copy and return its directory.
 
@@ -74,6 +81,8 @@ def sync_skill(source: Path, destination_root: Path, replace: bool = False) -> P
         raise NotADirectoryError(f"source is not a directory: {source}")
     if not (source / "SKILL.md").is_file():
         raise FileNotFoundError(f"source does not contain SKILL.md: {source}")
+    if any(_paths_overlap(source, target) for target in (destination, staging)):
+        raise ValueError("source and installation paths overlap")
 
     destination_root.mkdir(parents=True, exist_ok=True)
     if destination.exists() and not replace:

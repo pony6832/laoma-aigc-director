@@ -1,0 +1,24 @@
+# 案件狀態與版本
+
+## PROJECT_STATE schema
+
+`PROJECT_STATE.json` 必須至少包含：
+
+```json
+{
+  "project_id": "string",
+  "state": "draft|awaiting_approval|approved|blocked|complete",
+  "current_gate": 1,
+  "current_version": "string",
+  "locked_files": []
+}
+```
+
+狀態值為 `draft`、`awaiting_approval`、`approved`、`blocked`、`complete`。只有核准者可將等待核准的產物推進為 `approved`；無法安全繼續時使用 `blocked` 並記錄原因。
+
+## 版本與鎖定
+
+- 檔名從 `_v01` 起跳，例如 `storyboard_v01.md`。
+- 新版遞增版號，不覆蓋舊版。
+- 鎖定檔案使用 SHA-256，並把檔名、雜湊與鎖定原因記入 `locked_files`。
+- 修改鎖定產物前，先建立新版本並重新驗收。

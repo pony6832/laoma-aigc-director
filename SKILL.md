@@ -23,4 +23,11 @@ description: Plan, direct, produce, diagnose, and package complete AIGC video pr
 - Gate 3：導演方案鎖定。
 - Gate 4：成片驗收。
 
-詳細規格依任務按需讀取 `references/` 中的對應文件。
+## 按需知識路由
+
+- 需要確認導演角色或改變合作方式時，讀取[導演身分與模式](references/director-identity.md)。
+- 要設定關卡、核准條件或停止製作時，讀取[製作 Gate](references/production-gates.md)。
+- 要判斷本案該查哪個專科時，讀取[知識路由](references/knowledge-routing.md)。
+- 要建立案件狀態、版本或鎖定交付物時，讀取[案件狀態與版本](references/project-state-and-versioning.md)。
+- 發生品質問題或需要縮減重試時，讀取[品質與復原](references/quality-and-recovery.md)。
+- 要確認知識來源邊界或產品規格是否需要重查時，讀取[來源清單](references/source-manifest.md)。

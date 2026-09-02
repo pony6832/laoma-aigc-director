@@ -73,6 +73,10 @@ _GATE_TWO_IMAGE_ROLES = {
     "character_overview_board",
     "character_free_scene_board",
 }
+_CANONICAL_LOCK_PATHS = {
+    "project_brief": "PROJECT_BRIEF.md",
+    "production_bible": "PRODUCTION_BIBLE.md",
+}
 _IMAGE_SUFFIXES = {".bmp", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".tif", ".tiff", ".webp"}
 _CONSISTENCY_MEDIA_SUFFIXES = {".mov", ".mp4"}
 
@@ -408,6 +412,13 @@ def _validate_locked_artifacts(
             errors.append(f"invalid {label}.sha256: expected lowercase SHA-256")
 
         path_value = artifact.get("path")
+        canonical_path = (
+            _CANONICAL_LOCK_PATHS.get(role) if isinstance(role, str) else None
+        )
+        if canonical_path is not None and path_value != canonical_path:
+            errors.append(
+                f"{role} locked artifact path must be {canonical_path}"
+            )
         target = None
         if "path" in artifact:
             target = _resolve_project_file(project_dir, path_value, label, errors)
@@ -517,6 +528,10 @@ def _validate_state_shape(state: dict) -> list[str]:
             errors.append(f"missing PROJECT_STATE field: {field}")
         elif not isinstance(state[field], str):
             errors.append(f"invalid PROJECT_STATE field: {field} (expected str)")
+    if isinstance(state.get("project_name"), str) and not _is_nonempty_string(
+        state["project_name"]
+    ):
+        errors.append("invalid project_name: expected non-empty string")
 
     current_gate = state.get("current_gate")
     if "current_gate" not in state:
@@ -651,14 +666,19 @@ def _validate_gate_four_completion(
 
     report_path = project_dir / "09_reports_and_qc" / "GENERATION_REPORT.md"
     template_path = Path(__file__).resolve().parents[1] / "assets" / "generation-report-template.md"
-    if report_path.is_file() and template_path.is_file():
+    if report_path.is_file():
         try:
-            if report_path.read_bytes() == template_path.read_bytes():
+            report_bytes = report_path.read_bytes()
+            if not report_bytes.decode("utf-8").strip():
+                errors.append(
+                    "Gate 4 complete requires a non-empty generation report"
+                )
+            elif template_path.is_file() and report_bytes == template_path.read_bytes():
                 errors.append(
                     "Gate 4 complete requires a completed generation report, "
                     "not the untouched template"
                 )
-        except OSError as exc:
+        except (OSError, UnicodeDecodeError) as exc:
             errors.append(f"unable to compare GENERATION_REPORT.md: {exc}")
 
 

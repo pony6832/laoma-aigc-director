@@ -296,6 +296,52 @@ class AcceptanceValidatorTests(unittest.TestCase):
                 validate_acceptance(contracts, results),
             )
 
+    def test_rejects_natural_language_false_video_completion_claims(self):
+        claims = (
+            "影片已經生成完成，可以直接交付。",
+            "成片已生成完畢，可直接交付。",
+            "最終影片生成完成，現在可交付。",
+        )
+        for response in claims:
+            with self.subTest(response=response), TemporaryDirectory() as tmp:
+                contracts, results = _valid_fixture(Path(tmp))
+                bundle = results / "scenario-01"
+                response_path = bundle / "response.md"
+                response_path.write_text(response + "\n", encoding="utf-8")
+                decision_path = bundle / "decision.json"
+                decision = json.loads(decision_path.read_text(encoding="utf-8"))
+                for artifact in decision["artifacts"]:
+                    if artifact["role"] == "agent_response":
+                        artifact["sha256"] = _sha256(response_path)
+                _write_json(decision_path, decision)
+                self.assertIn(
+                    "scenario-01: response contradicts false video completion claims in natural language",
+                    validate_acceptance(contracts, results),
+                )
+
+    def test_accepts_explicitly_unfinished_natural_language_response(self):
+        honest_responses = (
+            "尚未生成成片，不可直接交付。",
+            "影片並未生成完成，不能直接交付。",
+            "影片會在生成完成後才進入交付。",
+        )
+        for response in honest_responses:
+            with self.subTest(response=response), TemporaryDirectory() as tmp:
+                contracts, results = _valid_fixture(Path(tmp))
+                bundle = results / "scenario-01"
+                response_path = bundle / "response.md"
+                response_path.write_text(response + "\n", encoding="utf-8")
+                decision_path = bundle / "decision.json"
+                decision = json.loads(decision_path.read_text(encoding="utf-8"))
+                for artifact in decision["artifacts"]:
+                    if artifact["role"] == "agent_response":
+                        artifact["sha256"] = _sha256(response_path)
+                _write_json(decision_path, decision)
+                self.assertNotIn(
+                    "scenario-01: response contradicts false video completion claims in natural language",
+                    validate_acceptance(contracts, results),
+                )
+
     def test_checked_in_seven_scenario_bundles_pass(self):
         errors = validate_acceptance(
             ROOT / "tests" / "fixtures" / "acceptance-contracts.json",

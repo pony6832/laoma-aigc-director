@@ -25,6 +25,16 @@ from scripts.validate_project import (
 SCHEMA_VERSION = "1.0"
 RUNTIME_SNAPSHOT = "director-methods-v1.0.0"
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_RESPONSE_CLAUSE_SPLIT = re.compile(r"[。！？!?；;，,\r\n]+")
+_VIDEO_SUBJECT = re.compile(r"(?:影片|成片)")
+_NEGATED_OR_FUTURE_VIDEO_CLAIM = re.compile(
+    r"(?:尚未|還沒|仍未|並未|未曾|沒有|尚無|不可|不能|無法|尚待|待生成|待製作|"
+    r"將|會|預計|若|如果|完成後|生成後)"
+)
+_POSITIVE_VIDEO_COMPLETION = re.compile(
+    r"(?:已(?:經)?(?:生成(?:完成|完畢)?|產出|製作完成|完成)|"
+    r"(?:生成|製作)(?:完成|完畢)|成片完成|可(?:以)?直接交付|可交付)"
+)
 
 
 def _read_json(path: Path, label: str, errors: list[str]) -> object | None:
@@ -301,6 +311,22 @@ def _validate_response_claims(
     for claim, marker in markers.items():
         if claims.get(claim) is False and marker in response:
             errors.append(f"{scenario_id}: response contradicts claim {claim}=false")
+    video_completion_is_false = any(
+        claims.get(claim) is False
+        for claim in ("finished_film_generated", "real_video_generated")
+    )
+    if video_completion_is_false:
+        for clause in _RESPONSE_CLAUSE_SPLIT.split(response):
+            if (
+                _VIDEO_SUBJECT.search(clause)
+                and not _NEGATED_OR_FUTURE_VIDEO_CLAIM.search(clause)
+                and _POSITIVE_VIDEO_COMPLETION.search(clause)
+            ):
+                errors.append(
+                    f"{scenario_id}: response contradicts false video completion "
+                    "claims in natural language"
+                )
+                break
     if claims.get("real_video_generated") is False:
         forbidden_output_roles = {
             "finished_film",

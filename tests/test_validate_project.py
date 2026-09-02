@@ -230,6 +230,19 @@ class ValidateProjectTests(unittest.TestCase):
                 validate_project(project),
             )
 
+    def test_project_name_must_be_nonempty(self):
+        for project_name in ("", "   "):
+            with self.subTest(project_name=repr(project_name)), TemporaryDirectory() as tmp:
+                project = create_project(Path(tmp), "測試片")
+                state_path = project / "PROJECT_STATE.json"
+                state = _read_json(state_path)
+                state["project_name"] = project_name
+                _write_json(state_path, state)
+                self.assertIn(
+                    "invalid project_name: expected non-empty string",
+                    validate_project(project),
+                )
+
     def test_rejects_invalid_or_timezone_naive_created_at(self):
         for timestamp in ("not-a-date", "2026-09-02T12:00:00"):
             with self.subTest(timestamp=timestamp), TemporaryDirectory() as tmp:
@@ -292,6 +305,51 @@ class ValidateProjectTests(unittest.TestCase):
             _write_json(state_path, state)
             self.assertIn(
                 "Gate 2 approval requires locked artifact role: consistency_test",
+                validate_project(project),
+            )
+
+    def test_project_brief_role_must_use_canonical_path(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state_path = project / "PROJECT_STATE.json"
+            state = _read_json(state_path)
+            state.update(
+                {
+                    "current_gate": 2,
+                    "status": "draft",
+                    "locked_artifacts": [
+                        _locked_artifact(
+                            project, "PRODUCTION_BIBLE.md", "project_brief"
+                        )
+                    ],
+                }
+            )
+            _write_json(state_path, state)
+            self.assertIn(
+                "project_brief locked artifact path must be PROJECT_BRIEF.md",
+                validate_project(project),
+            )
+
+    def test_production_bible_role_must_use_canonical_path(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            for artifact in locked:
+                if artifact["role"] == "production_bible":
+                    artifact["path"] = "PROJECT_BRIEF.md"
+                    artifact["sha256"] = _sha256(project / "PROJECT_BRIEF.md")
+            state_path = project / "PROJECT_STATE.json"
+            state = _read_json(state_path)
+            state.update(
+                {
+                    "current_gate": 2,
+                    "status": "approved",
+                    "locked_artifacts": locked,
+                }
+            )
+            _write_json(state_path, state)
+            self.assertIn(
+                "production_bible locked artifact path must be PRODUCTION_BIBLE.md",
                 validate_project(project),
             )
 
@@ -554,6 +612,22 @@ class ValidateProjectTests(unittest.TestCase):
                 "Gate 4 complete requires a completed generation report, not the untouched template",
                 validate_project(project),
             )
+
+    def test_gate_four_complete_rejects_empty_or_whitespace_generation_report(self):
+        for report_content in ("", " \n\t"):
+            with self.subTest(report_content=repr(report_content)), TemporaryDirectory() as tmp:
+                project = create_project(Path(tmp), "測試片")
+                state = _prepare_complete_gate_four(project)
+                report_path = project / "09_reports_and_qc" / "GENERATION_REPORT.md"
+                report_path.write_text(report_content, encoding="utf-8")
+                for artifact in state["locked_artifacts"]:
+                    if artifact["role"] == "generation_report":
+                        artifact["sha256"] = _sha256(report_path)
+                _write_json(project / "PROJECT_STATE.json", state)
+                self.assertIn(
+                    "Gate 4 complete requires a non-empty generation report",
+                    validate_project(project),
+                )
 
     def test_gate_four_complete_rejects_incomplete_qc_and_approval(self):
         with TemporaryDirectory() as tmp:

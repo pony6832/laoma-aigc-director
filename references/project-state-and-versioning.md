@@ -26,3 +26,17 @@
 - 新版遞增版號，不覆蓋舊版。
 - 鎖定產物使用 SHA-256，並把檔名、雜湊與鎖定原因記入 `locked_artifacts`。
 - 修改鎖定產物前，先建立新版本並重新驗收。
+
+## 可重現 Skill 安裝
+
+在可攜式來源根目錄執行以下命令，先建立暫存副本、寫入每個執行期檔案的 SHA-256，最後才將其改名為安裝目錄：
+
+```powershell
+python scripts/sync_skill.py --source . --destination-root "C:\Users\pony6832\.codex\skills"
+```
+
+工具只同步 `SKILL.md`、`agents`、`references`、`assets` 與 `scripts`；不會同步 `.git`、`tests` 或 `docs`。安裝後的 `.source-manifest.json` 可用於檔案完整性比對。若目的目錄已存在，預設會拒絕覆寫。明確加入 `--replace` 時，既有安裝會先保留為 `laoma-aigc-director.backup-YYYYMMDD-HHMMSS`，且不會被工具自動刪除：
+
+```powershell
+python scripts/sync_skill.py --source . --destination-root "C:\Users\pony6832\.codex\skills" --replace
+```

@@ -90,19 +90,43 @@ def sync_skill(source: Path, destination_root: Path, replace: bool = False) -> P
     if staging.exists():
         raise FileExistsError(f"staging directory already exists: {staging}")
 
-    staging.mkdir()
-    for entry in RUNTIME_ENTRIES:
-        _copy_runtime_entry(source, staging, entry)
-    _write_manifest(staging)
+    staging_created = False
+    backup: Path | None = None
+    try:
+        staging.mkdir()
+        staging_created = True
+        for entry in RUNTIME_ENTRIES:
+            _copy_runtime_entry(source, staging, entry)
+        _write_manifest(staging)
 
-    if destination.exists():
-        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        backup = destination_root / f"{SKILL_NAME}.backup-{timestamp}"
-        if backup.exists():
-            raise FileExistsError(f"backup destination already exists: {backup}")
-        destination.rename(backup)
-    staging.rename(destination)
-    return destination
+        if destination.exists():
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            backup = destination_root / f"{SKILL_NAME}.backup-{timestamp}"
+            if backup.exists():
+                raise FileExistsError(f"backup destination already exists: {backup}")
+            destination.rename(backup)
+        try:
+            staging.rename(destination)
+        except Exception:
+            if backup is not None:
+                try:
+                    backup.rename(destination)
+                except Exception as restore_error:
+                    raise RuntimeError(
+                        "skill promotion failed and the prior install could not be "
+                        f"restored; retained backup: {backup}"
+                    ) from restore_error
+            raise
+        return destination
+    except Exception:
+        if staging_created and staging.exists():
+            try:
+                shutil.rmtree(staging)
+            except OSError as cleanup_error:
+                raise RuntimeError(
+                    f"skill sync failed and staging cleanup also failed: {staging}"
+                ) from cleanup_error
+        raise
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -113,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         print(sync_skill(args.source, args.destination_root, replace=args.replace))
-    except OSError as exc:
+    except (OSError, RuntimeError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     return 0

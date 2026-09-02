@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 import hashlib
 import json
 import unittest
+from unittest.mock import patch
 
 from scripts.sync_skill import SKILL_NAME, sync_skill
 
@@ -91,6 +92,102 @@ class SyncSkillTests(unittest.TestCase):
             self.assertFalse((installed / "scripts" / "Docs").exists())
             self.assertFalse((installed / "scripts" / "Tests").exists())
             self.assertFalse((installed / "scripts" / ".GIT").exists())
+
+    def test_copy_failure_cleans_current_staging_and_preserves_install(self):
+        source = Path(__file__).resolve().parents[1]
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            installed = sync_skill(source, root)
+            marker = installed / "preserve-me.txt"
+            marker.write_text("old install", encoding="utf-8")
+
+            with patch(
+                "scripts.sync_skill._copy_runtime_entry",
+                side_effect=OSError("injected copy failure"),
+            ), self.assertRaisesRegex(OSError, "injected copy failure"):
+                sync_skill(source, root, replace=True)
+
+            self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
+            self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
+            self.assertEqual(list(root.glob(f"{SKILL_NAME}.backup-*")), [])
+
+    def test_manifest_failure_cleans_current_staging_and_preserves_install(self):
+        source = Path(__file__).resolve().parents[1]
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            installed = sync_skill(source, root)
+            marker = installed / "preserve-me.txt"
+            marker.write_text("old install", encoding="utf-8")
+
+            with patch(
+                "scripts.sync_skill._write_manifest",
+                side_effect=OSError("injected manifest failure"),
+            ), self.assertRaisesRegex(OSError, "injected manifest failure"):
+                sync_skill(source, root, replace=True)
+
+            self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
+            self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
+            self.assertEqual(list(root.glob(f"{SKILL_NAME}.backup-*")), [])
+
+    def test_promotion_failure_restores_prior_install_and_cleans_staging(self):
+        source = Path(__file__).resolve().parents[1]
+        original_rename = Path.rename
+
+        def fail_staging_promotion(path: Path, target: Path) -> Path:
+            if path.name == f".{SKILL_NAME}.staging":
+                raise OSError("injected promotion failure")
+            return original_rename(path, target)
+
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            installed = sync_skill(source, root)
+            marker = installed / "preserve-me.txt"
+            marker.write_text("old install", encoding="utf-8")
+
+            with patch.object(
+                Path, "rename", autospec=True, side_effect=fail_staging_promotion
+            ), self.assertRaisesRegex(OSError, "injected promotion failure"):
+                sync_skill(source, root, replace=True)
+
+            self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
+            self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
+            self.assertEqual(list(root.glob(f"{SKILL_NAME}.backup-*")), [])
+
+    def test_promotion_failure_without_prior_install_cleans_staging(self):
+        source = Path(__file__).resolve().parents[1]
+        original_rename = Path.rename
+
+        def fail_staging_promotion(path: Path, target: Path) -> Path:
+            if path.name == f".{SKILL_NAME}.staging":
+                raise OSError("injected promotion failure")
+            return original_rename(path, target)
+
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with patch.object(
+                Path, "rename", autospec=True, side_effect=fail_staging_promotion
+            ), self.assertRaisesRegex(OSError, "injected promotion failure"):
+                sync_skill(source, root)
+
+            self.assertFalse((root / SKILL_NAME).exists())
+            self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
+
+    def test_rejects_source_inside_staging_without_deleting_source(self):
+        with TemporaryDirectory() as tmp:
+            destination_root = Path(tmp) / "installed"
+            source = destination_root / f".{SKILL_NAME}.staging" / "source"
+            source.mkdir(parents=True)
+            skill_file = source / "SKILL.md"
+            skill_file.write_text("source inside staging", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "overlap"):
+                sync_skill(source, destination_root, replace=True)
+
+            self.assertEqual(
+                skill_file.read_text(encoding="utf-8"), "source inside staging"
+            )
+            self.assertTrue(source.is_dir())
+            self.assertEqual(list(destination_root.glob(f"{SKILL_NAME}.backup-*")), [])
 
 
 if __name__ == "__main__":

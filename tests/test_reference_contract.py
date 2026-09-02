@@ -27,6 +27,16 @@ class ReferenceContractTests(unittest.TestCase):
         self.assertIn("只提煉方法", text)
         self.assertIn("不匯入私人素材", text)
 
+    def test_project_state_reference_matches_initializer_schema(self):
+        text = (ROOT / "references" / "project-state-and-versioning.md").read_text(encoding="utf-8")
+        for field in (
+            "schema_version", "project_name", "project_version", "current_gate", "status",
+            "locked_artifacts", "open_decisions", "asset_status", "created_at",
+        ):
+            self.assertIn(f'"{field}"', text)
+        for obsolete in ("project_id", "current_version", "locked_files"):
+            self.assertNotIn(f'"{obsolete}"', text)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,11 +6,15 @@
 
 ```json
 {
-  "project_id": "string",
-  "state": "draft|awaiting_approval|approved|blocked|complete",
+  "schema_version": "1.0",
+  "project_name": "string",
+  "project_version": "V01",
   "current_gate": 1,
-  "current_version": "string",
-  "locked_files": []
+  "status": "draft|awaiting_approval|approved|blocked|complete",
+  "locked_artifacts": [],
+  "open_decisions": [],
+  "asset_status": {},
+  "created_at": "ISO 8601 timestamp"
 }
 ```
 
@@ -18,7 +22,7 @@
 
 ## 版本與鎖定
 
-- 檔名從 `_v01` 起跳，例如 `storyboard_v01.md`。
+- 案件目錄從 `_V01` 起跳，例如 `台北孤城_V01`。
 - 新版遞增版號，不覆蓋舊版。
-- 鎖定檔案使用 SHA-256，並把檔名、雜湊與鎖定原因記入 `locked_files`。
+- 鎖定產物使用 SHA-256，並把檔名、雜湊與鎖定原因記入 `locked_artifacts`。
 - 修改鎖定產物前，先建立新版本並重新驗收。

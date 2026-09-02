@@ -37,3 +37,14 @@
 - 失敗、重試與縮減策略：
 - 核准／退回與原因：
 - 已鎖定交付物、SHA-256 與鎖定原因：
+
+## PROJECT_STATE 完成證據回填
+
+> 本節是人工可讀摘要；唯一機器狀態仍在 `PROJECT_STATE.json`。不得只填本節而省略結構化資料。
+
+- `asset_status.outputs`：每個 `06_generated_assets/` 非空輸出的相對路徑、`vNN`、種類與 SHA-256。
+- `asset_status.qc`：`passed`、含時區檢查時間、檢查者、逐項名稱／狀態／證據。
+- `asset_status.approval`：`approved`、含時區核准時間、核准者與核准範圍。
+- `claimed_complete_without_output`：必須為 `false`。
+- `open_decisions`：Gate 4 complete 時必須為空。
+- 最終 `scripts/validate_project.py` 結果與時間：

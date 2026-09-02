@@ -9,6 +9,7 @@ REFERENCE_FILES = (
     "knowledge-routing.md",
     "project-state-and-versioning.md",
     "quality-and-recovery.md",
+    "knowledge-snapshot-v1.md",
     "source-manifest.md",
 )
 
@@ -26,6 +27,24 @@ class ReferenceContractTests(unittest.TestCase):
         self.assertIn("同步日期：2026-09-02", text)
         self.assertIn("只提煉方法", text)
         self.assertIn("不匯入私人素材", text)
+        self.assertIn("| 方法 | 來源檔案 | 快照／雜湊或版本 | 來源等級 | 適用版本／入口 | 同步日期 | 排除內容 |", text)
+        self.assertGreaterEqual(len(re.findall(r"\b[0-9a-f]{64}\b", text)), 8)
+
+    def test_knowledge_snapshot_is_actionable_and_self_contained(self):
+        text = (ROOT / "references" / "knowledge-snapshot-v1.md").read_text(
+            encoding="utf-8"
+        )
+        for heading in (
+            "角色與影像鎖定",
+            "導演與攝影",
+            "Seedance 路由",
+            "MiniMax H3 路由",
+            "ComfyUI 路由",
+            "聲音與後製",
+            "4–6 秒短測與 QC",
+        ):
+            self.assertIn(heading, text)
+        self.assertNotIn("../ai-video-learning-mentor", text)
 
     def test_project_state_reference_matches_initializer_schema(self):
         text = (ROOT / "references" / "project-state-and-versioning.md").read_text(encoding="utf-8")

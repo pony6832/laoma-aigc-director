@@ -4,7 +4,7 @@
 
 **Goal:** 建立、驗證並安裝一個獨立的 `laoma-aigc-director` Codex Skill，使它能以製片總導演模式把一句點子或一張圖推進為版本化的完整 AIGC 影片製作包。
 
-**Architecture:** 可攜式 Git 專案是唯一可編輯來源，正式 Codex Skill 是由同步腳本產生的安裝副本。`SKILL.md` 只負責身份、路由、資訊優先序與四個 Gate；詳細製作方法、狀態規格、模板與失敗回復各自獨立，Python 3.11 腳本負責案件初始化、結構驗證與來源／安裝副本雜湊比對。
+**Architecture:** 可攜式 Git 專案是唯一可編輯來源，正式 Codex Skill 是由同步腳本產生的安裝副本。`SKILL.md` 負責身份、可執行流程、資訊優先序、四個 Gate 與本地參考路由；版本化知識快照、狀態規格、模板與失敗回復各自獨立，Python 3.11 標準函式庫腳本負責案件初始化、結構／完整性／完成證據驗證與來源／安裝副本雜湊比對。
 
 **Tech Stack:** Markdown、YAML、JSON、Python 3.11 標準函式庫、PowerShell、Git、Codex Skill validator
 
@@ -23,6 +23,19 @@
 - 正式安裝目標位於 `C:\Users\pony6832\.codex\skills\laoma-aigc-director`。
 - 案件預設根目錄位於 `C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案`。
 
+## Final-review contract（2026-09-02）
+
+本節更新並優先於下方最初的逐步實作描述：
+
+- V1 唯一狀態 schema 為 `1.0`；`project_version` 使用 `VNN` 並與 `<project_name>_<project_version>` 目錄精確一致；時間必須是含時區 ISO 8601。
+- `locked_artifacts` 是含 `role/path/version/sha256/reason` 的物件清單；驗證器拒絕越界、遺失與雜湊不符。`open_decisions` 與 `asset_status` 也使用文件化結構，不新增同義欄位。
+- Gate 1–3 不可 `complete`；Gate 4 `complete` 要求非空輸出、匹配雜湊、非空白報告、全數通過且有證據的 QC、具名且含時區的核准、無未決項與 false-completion 旗標為 false。任何固定詞句都不是完成證據。
+- Gate 2 核准必須鎖定角色總覽板、無角色場景參考板及實際 4–6 秒一致性測試，不能用 prompt 或計畫代替。
+- 知識路由使用套件內 `director-methods-v1.0.0` 快照；`source-manifest.md` 逐方法記錄來源檔案、SHA-256／版本、來源等級、適用入口、同步日期及排除內容，不在 runtime 依賴來源技能資料夾。
+- 七案由執行 Agent 讀取最終 runtime 後在隔離目錄建立 response／artifact bundles，再由獨立標準函式庫 validator 驗證結構不變量；這不代表模型輸出本身具模型無關的決定性，也不代表已生成影片。
+- `sync_skill.py` 清理本次失敗 staging；若 promotion 在舊安裝改名後失敗，還原舊安裝；成功替換後保留備份。
+- 驗證報告分開記錄「被驗證 commit」與後續報告／修復 commit；只有在精確 final head 重跑才可稱 final head 已驗證。
+
 ---
 
 ## File Map
@@ -34,6 +47,7 @@
 | `references/director-identity.md` | 製片總導演、共同導演、導師三種互動模式 |
 | `references/production-gates.md` | 每個 Gate 的輸入、產物、通過條件和停止條件 |
 | `references/knowledge-routing.md` | 角色、故事、攝影、Seedance、H3、ComfyUI、聲音及後製的按需路由 |
+| `references/knowledge-snapshot-v1.md` | 自包含、版本化且可執行的角色／導演／生成入口／聲音／短測 QC 方法 |
 | `references/project-state-and-versioning.md` | `PROJECT_STATE.json`、鎖定狀態、版本命名和資料夾契約 |
 | `references/quality-and-recovery.md` | QC 量表、失敗標籤、單變數重試與誠實完成規則 |
 | `references/source-manifest.md` | 從影音導師匯入的方法、來源版本、同步日期與排除內容 |
@@ -52,6 +66,9 @@
 | `tests/test_validate_project.py` | Gate 完整度與錯誤診斷行為 |
 | `tests/test_sync_skill.py` | 安裝、副本內容與拒絕覆蓋行為 |
 | `tests/fixtures/scenarios.md` | 七個代表性真實請求和人工行為驗收條件 |
+| `tests/fixtures/acceptance-contracts.json` | 七案結構化模式、Gate、產物、禁止行為與證據不變量 |
+| `tests/acceptance/` | 執行 Agent 依最終 runtime 產生的七組 response／artifact bundles |
+| `tests/acceptance_validator.py` | 獨立驗證 bundle 產物、雜湊、事實與完成證據 |
 
 ---
 
@@ -171,6 +188,7 @@ git commit -m "feat: add AIGC director skill entry"
 - Create: `references/director-identity.md`
 - Create: `references/production-gates.md`
 - Create: `references/knowledge-routing.md`
+- Create: `references/knowledge-snapshot-v1.md`
 - Create: `references/project-state-and-versioning.md`
 - Create: `references/quality-and-recovery.md`
 - Create: `references/source-manifest.md`
@@ -195,6 +213,7 @@ REFERENCE_FILES = (
     "knowledge-routing.md",
     "project-state-and-versioning.md",
     "quality-and-recovery.md",
+    "knowledge-snapshot-v1.md",
     "source-manifest.md",
 )
 
@@ -239,6 +258,7 @@ production-gates.md
 
 knowledge-routing.md
   - 角色／定裝、故事／劇本、攝影／分鏡、Seedance、H3、ComfyUI、聲音／後製的觸發條件
+  - 每個分類路由到套件內 `knowledge-snapshot-v1.md` 的可執行方法，不依賴來源技能
   - 只讀取當前案件需要的專科
 
 project-state-and-versioning.md
@@ -251,9 +271,9 @@ quality-and-recovery.md
 
 source-manifest.md
   - 同步日期 2026-09-02
-  - 來源為 ai-video-learning-mentor 與已核准共同工作方法
+  - 每項方法逐列記錄來源檔案、來源 SHA-256／版本、來源等級、適用入口、同步日期與排除內容
   - 只提煉方法；不匯入私人素材、舊角色事實、舊故事或專屬提示詞
-  - 會變動的產品規格執行時重新查證
+  - 會變動的產品規格不匯入為固定事實，執行時重新查證
 ```
 
 在 `SKILL.md` 中加入六個 Markdown 相對連結，並說明各自何時讀取。
@@ -552,7 +572,9 @@ GATE_REQUIREMENTS = {
 }
 ```
 
-Gate 2 或以上時，`CHARACTER_PROFILE.json.status` 必須為 `approved`；Gate 3 或以上時，狀態中的 `locked_artifacts` 必須同時含 `PRODUCTION_BIBLE.md` 與 `CHARACTER_PROFILE.json`；Gate 4 `status="complete"` 時，生成報告必須含 `已知限制`，且 `asset_status` 不可有 `claimed_complete_without_output=true`。
+驗證器先檢查精確 `schema_version="1.0"`、`VNN` 專案版本、目錄後綴、含時區 ISO 8601、Gate/status 矩陣與三個結構化集合。每個 `locked_artifacts` 物件至少含 `role/path/version/sha256/reason`；路徑解析後必須仍在案件內、檔案存在且重算 SHA-256 相符。
+
+進入 Gate 2 要有 `project_brief` 鎖定；Gate 2 核准或進入 Gate 3 要有核准角色檔、Bible、角色總覽板、無角色場景板與實際 4–6 秒一致性測試的鎖定證據；Gate 3 核准或進入 Gate 4 要鎖定故事／劇本、逐鏡表與生成方案。Gate 4 `complete` 要有 `06_generated_assets/` 內非空輸出、`asset_status.outputs` 匹配雜湊、已填寫且鎖定的 generation report、逐項通過 QC、結構化使用者核准、無未決項及 `claimed_complete_without_output=false`。不可用報告內固定文字、空白模板、job ID 或口頭宣稱通過。
 
 CLI：
 
@@ -638,7 +660,7 @@ RUNTIME_ENTRIES = ("SKILL.md", "agents", "references", "assets", "scripts")
 SKILL_NAME = "laoma-aigc-director"
 ```
 
-同步流程必須先複製到 `destination_root/.laoma-aigc-director.staging`，計算每個檔案的 SHA-256，寫入 `.source-manifest.json`，再改名為正式目錄。正式目錄已存在且 `replace=False` 時拋出 `FileExistsError`；`replace=True` 時先改名為同層的 `laoma-aigc-director.backup-YYYYMMDD-HHMMSS`，安裝成功後保留備份，不自動刪除。
+同步流程必須先複製到 `destination_root/.laoma-aigc-director.staging`，計算每個檔案的 SHA-256，寫入 `.source-manifest.json`，再改名為正式目錄。正式目錄已存在且 `replace=False` 時拋出 `FileExistsError`；`replace=True` 時先改名為同層的 `laoma-aigc-director.backup-YYYYMMDD-HHMMSS`，安裝成功後保留備份，不自動刪除。複製、manifest 或 promotion 失敗時清除本次建立的 staging；若 promotion 在備份改名後失敗，先把備份還原為正式安裝。來源與 destination、staging 任一方向重疊（包含來源直接位於 staging 內）時，在任何 mutation 前拒絕。
 
 CLI：
 
@@ -661,18 +683,22 @@ git commit -m "feat: add safe skill sync and source manifest"
 
 ---
 
-### Task 7: 建立真實請求驗收案例
+### Task 7: 執行真實請求行為驗收
 
 **Files:**
 - Create: `tests/fixtures/scenarios.md`
+- Create: `tests/fixtures/acceptance-contracts.json`
+- Create: `tests/acceptance/`
+- Create: `tests/acceptance_validator.py`
+- Create: `tests/test_acceptance_validator.py`
 - Create: `tests/test_scenario_coverage.py`
 - Modify: `references/quality-and-recovery.md`
 
 **Interfaces:**
-- Consumes: Skill、四個 Gate、工具路由和失敗回復規則。
-- Produces: 七個可供人工或獨立執行者驗收的案例；每案含請求、預期模式、必要產物、禁止行為及完成證據。
+- Consumes: 最終 `SKILL.md`、四個 Gate、版本化知識快照、工具路由和失敗回復規則。
+- Produces: 七組由本次執行 Agent 實際建立的隔離 response／artifact bundles；每案含請求、結構化決策、實際檔案、雜湊、限制與完成證據，另由獨立 validator 檢查。
 
-- [ ] **Step 1: 寫入案例覆蓋測試**
+- [ ] **Step 1: 寫入案例與 bundle validator 的失敗測試**
 
 ```python
 from pathlib import Path
@@ -703,12 +729,12 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Step 2: 執行測試並確認案例檔不存在**
+- [ ] **Step 2: 執行測試並確認 validator／bundle 尚未存在而失敗**
 
-Run: `python -m unittest tests.test_scenario_coverage -v`  
-Expected: FAIL，指出 `tests/fixtures/scenarios.md` 不存在。
+Run: `python -m unittest tests.test_scenario_coverage tests.test_acceptance_validator -v`
+Expected: FAIL，指出結構化 contract、validator 或 bundle 尚未存在。
 
-- [ ] **Step 3: 寫入七個代表性案例**
+- [ ] **Step 3: 定義七案結構化不變量**
 
 每個案例固定包含：
 
@@ -722,28 +748,38 @@ Expected: FAIL，指出 `tests/fixtures/scenarios.md` 不存在。
 ### 完成證據
 ```
 
-七案依序使用：一句故事點子、一張虛構角色圖、已核准角色圖、只改一顆失敗鏡頭、生成入口不明、真人肖像或聲音授權不明、工具不可用。禁止行為至少覆蓋：偷用舊角色、跳過 Gate 3 直接大量生成、混用平台參數、覆蓋舊版、未生成卻聲稱成片。
+七案依序使用：一句故事點子、一張虛構角色圖、已核准角色圖、只改一顆失敗鏡頭、生成入口不明、真人肖像或聲音授權不明、工具不可用。`acceptance-contracts.json` 逐案指定模式、Gate、status、必要 artifact roles、必要結構化 facts、禁止 action／flag 與 completion evidence；禁止行為至少覆蓋偷用舊角色、跳過 Gate 3 直接大量生成、混用平台參數、覆蓋舊版、未生成卻聲稱成片。
 
-- [ ] **Step 4: 執行案例覆蓋與全套單元測試**
+- [ ] **Step 4: 本次執行 Agent 讀取最終 runtime 並建立七組隔離 bundle**
+
+每組至少含原請求、Agent response、`decision.json` 與一個以上 Gate 對應產物。產物 manifest 使用安全相對路徑與 SHA-256；`decision.json` 結構化記錄 mode、Gate、status、actions、facts、forbidden flags、completion evidence、claims 與 limitations。這是實際 Agent 判斷與文件交付練習，不是固定 phrase fixture，不呼叫付費影片平台，也不偽造影片輸出。
+
+- [ ] **Step 5: 獨立驗證七組 bundle**
+
+Run: `python tests/acceptance_validator.py --contracts tests/fixtures/acceptance-contracts.json --results tests/acceptance`
+Expected: `ACCEPTANCE_VALID: 7 scenarios`。Validator 檢查模式、Gate、status、必要 roles、實際檔案、非空內容、SHA-256、必要 facts、禁止行為、claims、limitations 與 completion evidence，不要求固定回覆措辭。
+
+- [ ] **Step 6: 執行案例覆蓋與 focused tests**
 
 Run: `python -m unittest discover -s tests -v`  
 Expected: 所有測試 PASS。
 
-- [ ] **Step 5: 提交行為案例**
+- [ ] **Step 7: 提交行為案例與驗證器**
 
 ```powershell
-git add tests/fixtures/scenarios.md tests/test_scenario_coverage.py references/quality-and-recovery.md
-git commit -m "test: add AIGC director acceptance scenarios"
+git add tests/fixtures tests/acceptance tests/acceptance_validator.py tests/test_acceptance_validator.py tests/test_scenario_coverage.py references/quality-and-recovery.md
+git commit -m "test: execute AIGC director acceptance scenarios"
 ```
 
 ---
 
-### Task 8: 完整驗證、正式安裝與第一個 Smoke Project
+### Task 8: 完整驗證、正式替換安裝與新版 Smoke Project
 
 **Files:**
 - Create: `docs/verification/2026-09-02-v1-verification.md`
 - Create outside repository: `C:\Users\pony6832\.codex\skills\laoma-aigc-director\`
-- Create outside repository: `C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案\V1_驗收短片_V01\`
+- Preserve outside repository: `C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案\V1_驗收短片_V01\`
+- Create outside repository: 初始化器回傳的下一個 `V1_驗收短片_VNN`（不得覆蓋 V01）
 
 **Interfaces:**
 - Consumes: Tasks 1–7 的可攜式來源、測試、初始化器、驗證器與同步器。
@@ -765,8 +801,8 @@ Expected: 沒有 placeholder；若測試案例刻意包含禁止用語，驗證�
 
 - [ ] **Step 2: 安裝正式 Skill 副本**
 
-Run: `python scripts/sync_skill.py --source . --destination-root "C:\Users\pony6832\.codex\skills"`  
-Expected: 建立 `C:\Users\pony6832\.codex\skills\laoma-aigc-director` 並輸出安裝路徑；若目標已存在，先檢查內容，再明確使用 `--replace` 產生可恢復備份。
+Run: `python scripts/sync_skill.py --source . --destination-root "C:\Users\pony6832\.codex\skills" --replace`
+Expected: 以安全 staging 更新 `C:\Users\pony6832\.codex\skills\laoma-aigc-director`，並保留本次替換前的 `laoma-aigc-director.backup-YYYYMMDD-HHMMSS`；不得刪除任何既有備份。
 
 - [ ] **Step 3: 驗證安裝副本**
 
@@ -776,13 +812,15 @@ Expected: 安裝副本驗證成功。
 Run: `python -c "import json,pathlib; p=pathlib.Path(r'C:\Users\pony6832\.codex\skills\laoma-aigc-director\.source-manifest.json'); d=json.loads(p.read_text(encoding='utf-8')); print(d['skill'], len(d['files']))"`  
 Expected: 第一欄為 `laoma-aigc-director`，檔案數大於 10。
 
-- [ ] **Step 4: 建立並驗證第一個 Smoke Project**
+另外逐一重算 manifest 內所有安裝檔案的 SHA-256，要求 missing=0、mismatch=0，並確認本次 retained backup 仍存在且含 `SKILL.md`。
+
+- [ ] **Step 4: 保留 V01，建立並驗證下一個 Smoke Project**
 
 Run: `python scripts/init_project.py --root "C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案" --name "V1_驗收短片"`  
-Expected: 建立第一個可用版本並輸出絕對路徑。
+Expected: 保留既有 `_V01`，建立下一個可用版本並輸出絕對路徑。
 
-Run: `python scripts/validate_project.py "C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案\V1_驗收短片_V01"`  
-Expected: `PROJECT_VALID`。若 `_V01` 先前已存在，使用初始化器實際輸出的版本路徑驗證，不覆蓋既有案件。
+Run: `python scripts/validate_project.py "<INITIALIZER_ACTUAL_OUTPUT_PATH>"`
+Expected: `PROJECT_VALID`，且 `_V01` 仍存在、原有內容未被初始化器覆蓋。
 
 - [ ] **Step 5: 寫入可追蹤驗證報告**
 
@@ -791,7 +829,8 @@ Expected: `PROJECT_VALID`。若 `_V01` 先前已存在，使用初始化器實�
 ```markdown
 # 老馬 AIGC 導演 V1 驗證報告
 
-- 原始碼 commit：執行時的 `git rev-parse HEAD`
+- 被驗證 commit：每次驗證前的 `git rev-parse HEAD`
+- 報告／修復 commit：寫入報告後另列；除非在該精確 head 重跑，不把它描述為已驗證 head
 - Python：`python --version`
 - 單元測試：通過數、失敗數、跳過數
 - Skill validator：可攜式來源與正式安裝副本的結果
@@ -800,12 +839,13 @@ Expected: `PROJECT_VALID`。若 `_V01` 先前已存在，使用初始化器實�
 - 驗證限制：尚未以付費第三方平台執行實際影片生成；不得把靜態驗證描述為成片驗證
 ```
 
-- [ ] **Step 6: 提交驗證報告並確認乾淨工作樹**
+- [ ] **Step 6: 提交報告，取得 final head 後重跑一次完整 suite 與靜態驗證**
 
 ```powershell
 git add docs/verification/2026-09-02-v1-verification.md
 git commit -m "chore: verify and install AIGC director V1"
+python -m unittest discover -s tests -v
 git status --short --branch
 ```
 
-Expected: `## feature/laoma-aigc-director-v1`，沒有未提交檔案；完成整體審查後再決定是否合併到 `main`。
+Expected: final committed head 的完整測試通過，`## feature/laoma-aigc-director-v1` 沒有未提交檔案；驗證報告清楚區分先前驗證 commit 與 final report commit。完成整體審查後再決定是否合併到 `main`。

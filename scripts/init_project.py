@@ -76,7 +76,22 @@ def create_project(projects_root: Path, project_name: str) -> Path:
                 "status": "draft",
                 "locked_artifacts": [],
                 "open_decisions": [],
-                "asset_status": {},
+                "asset_status": {
+                    "claimed_complete_without_output": False,
+                    "outputs": [],
+                    "qc": {
+                        "status": "not_started",
+                        "checked_at": None,
+                        "checked_by": "",
+                        "checks": [],
+                    },
+                    "approval": {
+                        "status": "not_requested",
+                        "approved_at": None,
+                        "approved_by": "",
+                        "scope": [],
+                    },
+                },
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
             (project_dir / "PROJECT_STATE.json").write_text(

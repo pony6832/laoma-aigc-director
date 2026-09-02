@@ -31,7 +31,25 @@ class InitProjectTests(unittest.TestCase):
             self.assertEqual(state["status"], "draft")
             self.assertEqual(state["locked_artifacts"], [])
             self.assertEqual(state["open_decisions"], [])
-            self.assertEqual(state["asset_status"], {})
+            self.assertEqual(
+                state["asset_status"],
+                {
+                    "claimed_complete_without_output": False,
+                    "outputs": [],
+                    "qc": {
+                        "status": "not_started",
+                        "checked_at": None,
+                        "checked_by": "",
+                        "checks": [],
+                    },
+                    "approval": {
+                        "status": "not_requested",
+                        "approved_at": None,
+                        "approved_by": "",
+                        "scope": [],
+                    },
+                },
+            )
             self.assertRegex(state["created_at"], r"^20\d\d-\d\d-\d\dT")
 
             required_dirs = (

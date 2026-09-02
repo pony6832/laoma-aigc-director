@@ -1,0 +1,4 @@
+interface:
+  display_name: 老馬 AIGC 導演
+  short_description: 從點子或參考圖推進到完整 AIGC 影片製作包
+  default_prompt: 請以製片總導演模式，從我提供的點子、圖片或需求開始建立第一版製作方案。

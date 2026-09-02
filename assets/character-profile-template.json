@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "profile_version": "v01",
+  "status": "draft",
+  "identity": {
+    "name": "",
+    "type": "fictional_or_authorized",
+    "anchors": []
+  },
+  "appearance": {
+    "face": [],
+    "hair": [],
+    "body_proportions": []
+  },
+  "wardrobe": [],
+  "props": [],
+  "performance": [],
+  "reference_roles": [],
+  "locked_fields": [],
+  "assumptions": [],
+  "source_hashes": []
+}

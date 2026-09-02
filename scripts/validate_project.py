@@ -31,6 +31,15 @@ GATE_REQUIREMENTS = {
     3: ("03_story_and_script", "04_shot_design/SHOT_PRODUCTION_TABLE.md"),
     4: ("09_reports_and_qc/GENERATION_REPORT.md",),
 }
+STATE_FIELD_TYPES = (
+    ("schema_version", str, "str"),
+    ("project_name", str, "str"),
+    ("project_version", str, "str"),
+    ("locked_artifacts", list, "list"),
+    ("open_decisions", list, "list"),
+    ("asset_status", dict, "object"),
+    ("created_at", str, "str"),
+)
 
 
 def _load_json(path: Path, label: str, errors: list[str]) -> dict | None:
@@ -53,6 +62,36 @@ def _require_path(project_dir: Path, requirement: str, errors: list[str]) -> Non
     errors.append(f"missing {kind}: {requirement}")
 
 
+def _validate_state(state: dict) -> list[str]:
+    errors: list[str] = []
+    for field in ("schema_version", "project_name", "project_version"):
+        if field not in state:
+            errors.append(f"missing PROJECT_STATE field: {field}")
+        elif not isinstance(state[field], str):
+            errors.append(f"invalid PROJECT_STATE field: {field} (expected str)")
+
+    current_gate = state.get("current_gate")
+    if "current_gate" not in state:
+        errors.append("missing PROJECT_STATE field: current_gate")
+    elif not isinstance(current_gate, int) or isinstance(current_gate, bool) or current_gate not in GATE_REQUIREMENTS:
+        errors.append("invalid PROJECT_STATE field: current_gate (expected int from 1 to 4)")
+
+    status = state.get("status")
+    if "status" not in state:
+        errors.append("missing PROJECT_STATE field: status")
+    elif not isinstance(status, str):
+        errors.append("invalid project status: expected str")
+    elif status not in VALID_STATUSES:
+        errors.append(f"invalid project status: {status!r}")
+
+    for field, expected_type, expected_name in STATE_FIELD_TYPES[3:]:
+        if field not in state:
+            errors.append(f"missing PROJECT_STATE field: {field}")
+        elif not isinstance(state[field], expected_type):
+            errors.append(f"invalid PROJECT_STATE field: {field} (expected {expected_name})")
+    return errors
+
+
 def validate_project(project_dir: Path) -> list[str]:
     """Return actionable validation errors for ``project_dir`` in stable order."""
     project_dir = Path(project_dir)
@@ -72,14 +111,12 @@ def validate_project(project_dir: Path) -> list[str]:
     if state is None:
         return errors
 
-    status = state.get("status")
-    if status not in VALID_STATUSES:
-        errors.append(f"invalid project status: {status!r}")
-
-    current_gate = state.get("current_gate")
-    if not isinstance(current_gate, int) or isinstance(current_gate, bool) or current_gate not in GATE_REQUIREMENTS:
-        errors.append(f"invalid current_gate: {current_gate!r}")
+    errors.extend(_validate_state(state))
+    if errors:
         return errors
+
+    current_gate = state["current_gate"]
+    status = state["status"]
 
     for gate in range(1, current_gate + 1):
         for requirement in GATE_REQUIREMENTS[gate]:
@@ -94,12 +131,9 @@ def validate_project(project_dir: Path) -> list[str]:
 
     if current_gate >= 3:
         locked_artifacts = state.get("locked_artifacts")
-        if not isinstance(locked_artifacts, list):
-            errors.append("invalid locked_artifacts: expected a list")
-        else:
-            for artifact in ("PRODUCTION_BIBLE.md", "CHARACTER_PROFILE.json"):
-                if artifact not in locked_artifacts:
-                    errors.append(f"Gate 3 requires locked artifact: {artifact}")
+        for artifact in ("PRODUCTION_BIBLE.md", "CHARACTER_PROFILE.json"):
+            if artifact not in locked_artifacts:
+                errors.append(f"Gate 3 requires locked artifact: {artifact}")
 
     if current_gate >= 4 and status == "complete":
         report_path = project_dir / "09_reports_and_qc" / "GENERATION_REPORT.md"
@@ -112,9 +146,7 @@ def validate_project(project_dir: Path) -> list[str]:
                 if "已知限制" not in report:
                     errors.append("Gate 4 complete project requires GENERATION_REPORT.md to contain 已知限制")
         asset_status = state.get("asset_status")
-        if not isinstance(asset_status, dict):
-            errors.append("invalid asset_status: expected an object")
-        elif asset_status.get("claimed_complete_without_output") is True:
+        if asset_status.get("claimed_complete_without_output") is True:
             errors.append("Gate 4 complete project cannot claim complete without output")
 
     return errors

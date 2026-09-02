@@ -82,6 +82,74 @@ class ValidateProjectTests(unittest.TestCase):
             report_path.write_text("Generation report", encoding="utf-8")
             self.assertIn("Gate 4 complete project requires GENERATION_REPORT.md to contain 已知限制", validate_project(project))
 
+    def test_unhashable_status_values_return_diagnostics(self):
+        for status in ([], {}):
+            with self.subTest(status=status), TemporaryDirectory() as tmp:
+                project = create_project(Path(tmp), "測試片")
+                state_path = project / "PROJECT_STATE.json"
+                state = json.loads(state_path.read_text(encoding="utf-8"))
+                state["status"] = status
+                state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+                self.assertEqual(validate_project(project), ["invalid project status: expected str"])
+
+    def test_missing_canonical_state_fields_are_reported_in_schema_order(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state_path = project / "PROJECT_STATE.json"
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            for field in (
+                "schema_version", "project_name", "project_version", "current_gate", "status",
+                "locked_artifacts", "open_decisions", "asset_status", "created_at",
+            ):
+                del state[field]
+            state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.assertEqual(
+                validate_project(project),
+                [
+                    "missing PROJECT_STATE field: schema_version",
+                    "missing PROJECT_STATE field: project_name",
+                    "missing PROJECT_STATE field: project_version",
+                    "missing PROJECT_STATE field: current_gate",
+                    "missing PROJECT_STATE field: status",
+                    "missing PROJECT_STATE field: locked_artifacts",
+                    "missing PROJECT_STATE field: open_decisions",
+                    "missing PROJECT_STATE field: asset_status",
+                    "missing PROJECT_STATE field: created_at",
+                ],
+            )
+
+    def test_wrong_typed_canonical_state_fields_are_reported(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state_path = project / "PROJECT_STATE.json"
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            state.update({
+                "schema_version": 1,
+                "project_name": [],
+                "project_version": {},
+                "current_gate": True,
+                "status": [],
+                "locked_artifacts": {},
+                "open_decisions": "open",
+                "asset_status": [],
+                "created_at": 0,
+            })
+            state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.assertEqual(
+                validate_project(project),
+                [
+                    "invalid PROJECT_STATE field: schema_version (expected str)",
+                    "invalid PROJECT_STATE field: project_name (expected str)",
+                    "invalid PROJECT_STATE field: project_version (expected str)",
+                    "invalid PROJECT_STATE field: current_gate (expected int from 1 to 4)",
+                    "invalid project status: expected str",
+                    "invalid PROJECT_STATE field: locked_artifacts (expected list)",
+                    "invalid PROJECT_STATE field: open_decisions (expected list)",
+                    "invalid PROJECT_STATE field: asset_status (expected object)",
+                    "invalid PROJECT_STATE field: created_at (expected str)",
+                ],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

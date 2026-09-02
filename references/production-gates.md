@@ -28,13 +28,13 @@ Gate 1–3 不可使用 `complete`；Gate 4 不使用 `approved`，因為實體�
 - 最低產物：
   - 核准的 `CHARACTER_PROFILE.json`。
   - `PRODUCTION_BIBLE.md`。
-  - 一張角色總覽板，角色、服裝、道具與外觀錨點清楚。
-  - 一張無角色場景參考板，只鎖定空間、光線、材質、色彩與環境狀態。
-  - 一個 4–6 秒一致性短測；長片、多人或高一致性角色不可略過。
-- 通過條件：身分、定裝、場景、視覺基準與短測可驗證；以上六個角色 `production_bible`、`character_profile`、`character_overview_board`、`character_free_scene_board`、`consistency_test`（連同上一 Gate 的 `project_brief`）全部以檔案雜湊鎖定。短測另記 `duration_seconds`，必須介於 4 與 6。
+  - `02_character_and_look/` 內一張非空、可辨識的角色總覽圖，角色、服裝、道具與外觀錨點清楚。
+  - `02_character_and_look/` 內一張非空、可辨識的無角色場景參考圖，只鎖定空間、光線、材質、色彩與環境狀態。
+  - `02_character_and_look/` 內一個非空 MP4／MOV 一致性短測；容器實際時長必須為 4–6 秒，長片、多人或高一致性角色不可略過。
+- 通過條件：身分、定裝、場景、視覺基準與短測可驗證；以上六個角色 `production_bible`、`character_profile`、`character_overview_board`、`character_free_scene_board`、`consistency_test`（連同上一 Gate 的 `project_brief`）全部以檔案雜湊鎖定。短測另記 `duration_seconds`，必須與容器讀取時長相符且介於 4 與 6。
 - 停止條件：參考權利不明、事實衝突，或短測未通過。
 
-進入 Gate 3 代表 Gate 2 已核准；不得拿角色圖代替場景板，也不得拿提示詞或測試計畫代替實際短測輸出。
+進入 Gate 3 代表 Gate 2 已核准；不得拿角色圖代替場景板，也不得拿文字檔、空檔、提示詞、測試計畫或自行宣告的時長代替實際短測輸出。
 
 ## Gate 3：導演方案鎖定
 
@@ -50,7 +50,7 @@ Gate 3 通過前不得進入批次或高成本生成。只修失敗鏡頭時，�
 - 輸入：Gate 3 的鎖定方案、實際生成鏡頭、聲音與後製版本。
 - 最低產物：
   - `06_generated_assets/` 內至少一個實際存在且非空的輸出檔。
-  - `asset_status.outputs` 中每個輸出的相對路徑、版本、種類與匹配 SHA-256。
+  - `asset_status.outputs` 中每個輸出的安全相對路徑、版本、種類與匹配 SHA-256；正規化後必須仍位於 `06_generated_assets/`，不可用絕對路徑或 `..` 逃逸。
   - 已填寫且不等於原始空白模板的 `GENERATION_REPORT.md`，並以 `generation_report` 角色鎖定。
   - `asset_status.qc` 中非空檢查清單；每項為 `passed` 且有證據、檢查者與含時區時間。
   - `asset_status.approval` 中使用者核准者、含時區時間與非空核准範圍。

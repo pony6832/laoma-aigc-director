@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "project_name": "雨巷紙船單鏡修復",
   "project_version": "V01",
-  "current_gate": 3,
+  "current_gate": 1,
   "status": "blocked",
   "locked_artifacts": [],
   "open_decisions": [

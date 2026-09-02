@@ -60,7 +60,7 @@
 角色 `role` 用於 Gate 驗證，不是另一份狀態來源。固定角色包括：
 
 - Gate 1：`project_brief`。
-- Gate 2：`production_bible`、`character_profile`、`character_overview_board`、`character_free_scene_board`、`consistency_test`。其中短測另加 4–6 的 `duration_seconds`。
+- Gate 2：`production_bible`、`character_profile`、`character_overview_board`、`character_free_scene_board`、`consistency_test`。兩張 board 必須是 `02_character_and_look/` 內非空、可辨識的圖像；短測必須是該目錄內非空 MP4／MOV，另加與容器實際時長相符且介於 4–6 的 `duration_seconds`。文字計畫、空檔或只填宣告時長不可代替這些媒體。
 - Gate 3：`story_script`、`shot_production_table`、`generation_plan`。
 - Gate 4：`generation_report`。
 
@@ -117,7 +117,7 @@
 }
 ```
 
-- `outputs` 必須指向 `06_generated_assets/` 內非空檔案並重算匹配 SHA-256。
+- `outputs` 的路徑正規化後必須仍指向 `06_generated_assets/` 內非空檔案並重算匹配 SHA-256；拒絕絕對路徑與 `..` 逃逸。
 - QC `status` 可為 `not_started|pending|passed|failed`；每項 check 為 `pending|passed|failed`。
 - approval `status` 可為 `not_requested|pending|approved|rejected`。
 - Gate 4 `complete` 只接受 QC 全部通過、核准完成、有非空 scope、無未決項及 `claimed_complete_without_output=false`。

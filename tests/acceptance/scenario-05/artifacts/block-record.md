@@ -1,7 +1,7 @@
 # Generation Block Record
 
 - 阻擋代碼：`generation_entry_unknown`
-- Gate／狀態：`3 / blocked`
+- Gate／狀態：`1 / blocked`（沒有可驗證的原專案狀態；目標解除後回到已核准 Gate 3 方案）
 - 已確認：使用者要求依既有方案生成。
 - 未確認：入口名稱、入口版本、帳號／credits、本機或雲端、素材外傳權、模型顯示名稱、支援輸入、時長、比例、解析度、費用與地區。
 - 執行紀錄：未選平台、未連線、未送出 prompt、未建立 job ID、未建立輸出。

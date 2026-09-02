@@ -1,7 +1,7 @@
 {
   "scenario_id": "scenario-05",
   "mode": "producer_director",
-  "current_gate": 3,
+  "current_gate": 1,
   "status": "blocked",
   "execution": {
     "executor": "codex-agent-final-fix-wave",
@@ -16,6 +16,7 @@
   ],
   "facts": {
     "generation_entry_selected": false,
+    "validated_project_state_available": false,
     "generation_request_sent": false,
     "generation_job_id_recorded": false,
     "parameter_set_assumed": false
@@ -37,7 +38,7 @@
     },
     {
       "kind": "gate_state",
-      "detail": "state records Gate 3 blocked with generation-entry-unknown open"
+      "detail": "state records Gate 1 blocked because original project state is absent and generation-entry-unknown is open"
     },
     {
       "kind": "routing_blocker",
@@ -62,17 +63,17 @@
     {
       "role": "agent_response",
       "path": "response.md",
-      "sha256": "d3d9aa856aafa1741169397f99965406e589d47474013e64a628d1db68546751"
+      "sha256": "65e190d44278337665e2180e16b40075814029b836fc16aaa45ea4965fd59de9"
     },
     {
       "role": "project_state",
       "path": "artifacts/project-state.json",
-      "sha256": "015939c40a1fe46524020c46d9b9f007a0d66b0690c2fd82cdfb349a8c945de3"
+      "sha256": "da6c1742de203bb43c259f897078374ee5129ae1cbaf3d78bf5cfa3f872dffa8"
     },
     {
       "role": "block_record",
       "path": "artifacts/block-record.md",
-      "sha256": "73fe5036e94959fe0f84d1029855282a0a31ef70689727099b82a60580572515"
+      "sha256": "b8818990c618b1218321a2222cc3c1f3dfe46c4300205d0ce7b9c1a9aa6ac8b0"
     },
     {
       "role": "tool_route_options",

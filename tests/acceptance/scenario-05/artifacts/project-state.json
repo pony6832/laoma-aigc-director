@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "project_name": "入口待定生成案",
   "project_version": "V01",
-  "current_gate": 3,
+  "current_gate": 1,
   "status": "blocked",
   "locked_artifacts": [],
   "open_decisions": [

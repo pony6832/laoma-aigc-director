@@ -30,9 +30,9 @@
 - V1 唯一狀態 schema 為 `1.0`；`project_version` 使用 `VNN` 並與 `<project_name>_<project_version>` 目錄精確一致；時間必須是含時區 ISO 8601。
 - `locked_artifacts` 是含 `role/path/version/sha256/reason` 的物件清單；驗證器拒絕越界、遺失與雜湊不符。`open_decisions` 與 `asset_status` 也使用文件化結構，不新增同義欄位。
 - Gate 1–3 不可 `complete`；Gate 4 `complete` 要求非空輸出、匹配雜湊、非空白報告、全數通過且有證據的 QC、具名且含時區的核准、無未決項與 false-completion 旗標為 false。任何固定詞句都不是完成證據。
-- Gate 2 核准必須鎖定角色總覽板、無角色場景參考板及實際 4–6 秒一致性測試，不能用 prompt 或計畫代替。
+- Gate 2 核准必須鎖定 `02_character_and_look/` 內非空、可辨識的角色總覽圖與無角色場景參考圖，以及能從 MP4／MOV 容器驗證且宣告時長相符的實際 4–6 秒一致性測試；不能用文字、空檔、prompt、計畫或自行宣告時長代替。
 - 知識路由使用套件內 `director-methods-v1.0.0` 快照；`source-manifest.md` 逐方法記錄來源檔案、SHA-256／版本、來源等級、適用入口、同步日期及排除內容，不在 runtime 依賴來源技能資料夾。
-- 七案由執行 Agent 讀取最終 runtime 後在隔離目錄建立 response／artifact bundles，再由獨立標準函式庫 validator 驗證結構不變量；這不代表模型輸出本身具模型無關的決定性，也不代表已生成影片。
+- 七案由執行 Agent 讀取最終 runtime 後在隔離目錄建立 response／artifact bundles，再由獨立標準函式庫 validator 驗證結構不變量，並交叉檢查 `project-state.json`、前置 Gate 鎖定角色／雜湊與回覆中的明確完成聲明；這不代表模型輸出本身具模型無關的決定性，也不代表已生成影片。
 - `sync_skill.py` 清理本次失敗 staging；若 promotion 在舊安裝改名後失敗，還原舊安裝；成功替換後保留備份。
 - 驗證報告分開記錄「被驗證 commit」與後續報告／修復 commit；只有在精確 final head 重跑才可稱 final head 已驗證。
 
@@ -574,7 +574,7 @@ GATE_REQUIREMENTS = {
 
 驗證器先檢查精確 `schema_version="1.0"`、`VNN` 專案版本、目錄後綴、含時區 ISO 8601、Gate/status 矩陣與三個結構化集合。每個 `locked_artifacts` 物件至少含 `role/path/version/sha256/reason`；路徑解析後必須仍在案件內、檔案存在且重算 SHA-256 相符。
 
-進入 Gate 2 要有 `project_brief` 鎖定；Gate 2 核准或進入 Gate 3 要有核准角色檔、Bible、角色總覽板、無角色場景板與實際 4–6 秒一致性測試的鎖定證據；Gate 3 核准或進入 Gate 4 要鎖定故事／劇本、逐鏡表與生成方案。Gate 4 `complete` 要有 `06_generated_assets/` 內非空輸出、`asset_status.outputs` 匹配雜湊、已填寫且鎖定的 generation report、逐項通過 QC、結構化使用者核准、無未決項及 `claimed_complete_without_output=false`。不可用報告內固定文字、空白模板、job ID 或口頭宣稱通過。
+進入 Gate 2 要有 `project_brief` 鎖定；Gate 2 核准或進入 Gate 3 要有核准角色檔、Bible、`02_character_and_look/` 內非空可辨識的角色總覽圖與無角色場景圖，以及能由 MP4／MOV 容器驗證、宣告時長相符的實際 4–6 秒一致性測試鎖定證據；Gate 3 核准或進入 Gate 4 要鎖定故事／劇本、逐鏡表與生成方案。Gate 4 `complete` 要有正規化後仍位於 `06_generated_assets/` 的非空輸出、`asset_status.outputs` 匹配雜湊、已填寫且鎖定的 generation report、逐項通過 QC、結構化使用者核准、無未決項及 `claimed_complete_without_output=false`。不可用報告內固定文字、空白模板、job ID、口頭宣稱或自行宣告時長通過。
 
 CLI：
 
@@ -752,12 +752,12 @@ Expected: FAIL，指出結構化 contract、validator 或 bundle 尚未存在。
 
 - [ ] **Step 4: 本次執行 Agent 讀取最終 runtime 並建立七組隔離 bundle**
 
-每組至少含原請求、Agent response、`decision.json` 與一個以上 Gate 對應產物。產物 manifest 使用安全相對路徑與 SHA-256；`decision.json` 結構化記錄 mode、Gate、status、actions、facts、forbidden flags、completion evidence、claims 與 limitations。這是實際 Agent 判斷與文件交付練習，不是固定 phrase fixture，不呼叫付費影片平台，也不偽造影片輸出。
+每組至少含原請求、Agent response、`decision.json`、`project-state.json` 與一個以上 Gate 對應產物。產物 manifest 使用安全相對路徑與 SHA-256；`decision.json` 結構化記錄 mode、Gate、status、actions、facts、forbidden flags、completion evidence、claims 與 limitations。Validator 必須交叉檢查 state 的 schema、Gate/status、前置 Gate 鎖定角色／雜湊及回覆中的明確完成聲明。缺少真實案件 state／鎖定證據時，只能保留誠實的實際 Gate 並阻擋推進，即使仍可交付目標 Gate 的製作包。這是實際 Agent 判斷與文件交付練習，不是固定 phrase fixture，不呼叫付費影片平台，也不偽造影片輸出。
 
 - [ ] **Step 5: 獨立驗證七組 bundle**
 
 Run: `python tests/acceptance_validator.py --contracts tests/fixtures/acceptance-contracts.json --results tests/acceptance`
-Expected: `ACCEPTANCE_VALID: 7 scenarios`。Validator 檢查模式、Gate、status、必要 roles、實際檔案、非空內容、SHA-256、必要 facts、禁止行為、claims、limitations 與 completion evidence，不要求固定回覆措辭。
+Expected: `ACCEPTANCE_VALID: 7 scenarios`。Validator 檢查模式、Gate、status、必要 roles、實際檔案、非空內容、SHA-256、必要 facts、禁止行為、claims、limitations、completion evidence，以及 `project-state.json` 與前置 Gate 鎖定不變量；並拒絕回覆中與 false 完成聲明矛盾的明確機器標記，不要求固定回覆措辭或聲稱能判斷任意自然語言語意。
 
 - [ ] **Step 6: 執行案例覆蓋與 focused tests**
 

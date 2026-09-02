@@ -1,7 +1,7 @@
 {
   "scenario_id": "scenario-04",
   "mode": "producer_director",
-  "current_gate": 3,
+  "current_gate": 1,
   "status": "blocked",
   "execution": {
     "executor": "codex-agent-final-fix-wave",
@@ -19,6 +19,7 @@
   "facts": {
     "changed_shot_ids": ["002"],
     "unchanged_shot_ids": ["001", "003"],
+    "validated_project_state_available": false,
     "source_media_available": false,
     "actual_retry_output_generated": false,
     "single_shot_qc_passed": false,
@@ -41,7 +42,7 @@
     },
     {
       "kind": "gate_state",
-      "detail": "state remains Gate 3 blocked pending the real project and shot media"
+      "detail": "state remains Gate 1 blocked because the real project state and shot media are unavailable"
     },
     {
       "kind": "scope_control",
@@ -70,12 +71,12 @@
     {
       "role": "agent_response",
       "path": "response.md",
-      "sha256": "addadc1cf45b6eae7da6495e384008f91fb01dd44d586825aa5b96e81b882d75"
+      "sha256": "550403c4d2a907a2f2fda0dab67f093941ddd39225a02db1bf5d904cff0b88a3"
     },
     {
       "role": "project_state",
       "path": "artifacts/project-state.json",
-      "sha256": "2797280343860d04cfc4396339a1393608c6a398fb7969db05cd83295ecfb510"
+      "sha256": "c8dcbbe5d826c129eebc70b90eb907498224f1fb91bbd8188104a786eaa7dece"
     },
     {
       "role": "failure_qc",

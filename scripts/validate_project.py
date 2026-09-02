@@ -8,6 +8,8 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import BinaryIO, Iterator
+from xml.etree import ElementTree
 
 
 SUPPORTED_SCHEMA_VERSION = "1.0"
@@ -67,6 +69,12 @@ _PROJECT_VERSION = re.compile(r"^V\d{2,}$")
 _ARTIFACT_VERSION = re.compile(r"^v\d{2,}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _ROLE = re.compile(r"^[a-z][a-z0-9_]*$")
+_GATE_TWO_IMAGE_ROLES = {
+    "character_overview_board",
+    "character_free_scene_board",
+}
+_IMAGE_SUFFIXES = {".bmp", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".tif", ".tiff", ".webp"}
+_CONSISTENCY_MEDIA_SUFFIXES = {".mov", ".mp4"}
 
 
 def _load_json(path: Path, label: str, errors: list[str]) -> dict | None:
@@ -111,6 +119,126 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _is_inside(target: Path, root: Path) -> bool:
+    try:
+        target.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def _is_supported_image_file(path: Path) -> bool:
+    suffix = path.suffix.lower()
+    if suffix not in _IMAGE_SUFFIXES or path.stat().st_size == 0:
+        return False
+    if suffix == ".svg":
+        try:
+            root = ElementTree.parse(path).getroot()
+        except (ElementTree.ParseError, OSError):
+            return False
+        return root.tag.rsplit("}", 1)[-1].lower() == "svg"
+    with path.open("rb") as stream:
+        head = stream.read(16)
+        if suffix == ".png":
+            return head.startswith(b"\x89PNG\r\n\x1a\n")
+        if suffix in {".jpg", ".jpeg"}:
+            return head.startswith(b"\xff\xd8\xff")
+        if suffix == ".gif":
+            return head.startswith((b"GIF87a", b"GIF89a"))
+        if suffix == ".bmp":
+            return head.startswith(b"BM")
+        if suffix in {".tif", ".tiff"}:
+            return head.startswith((b"II*\x00", b"MM\x00*"))
+        if suffix == ".webp":
+            return head.startswith(b"RIFF") and head[8:12] == b"WEBP"
+    return False
+
+
+def _iter_iso_bmff_boxes(
+    stream: BinaryIO, start: int, end: int
+) -> Iterator[tuple[bytes, int, int]]:
+    position = start
+    while position + 8 <= end:
+        stream.seek(position)
+        header = stream.read(8)
+        if len(header) != 8:
+            return
+        size = int.from_bytes(header[:4], "big")
+        box_type = header[4:8]
+        header_size = 8
+        if size == 1:
+            extended = stream.read(8)
+            if len(extended) != 8:
+                return
+            size = int.from_bytes(extended, "big")
+            header_size = 16
+        elif size == 0:
+            size = end - position
+        if size < header_size or position + size > end:
+            return
+        yield box_type, position + header_size, position + size
+        position += size
+
+
+def _read_iso_bmff_duration(path: Path) -> float | None:
+    try:
+        with path.open("rb") as stream:
+            stream.seek(0, 2)
+            file_size = stream.tell()
+            top_level = list(_iter_iso_bmff_boxes(stream, 0, file_size))
+            has_ftyp = any(box_type == b"ftyp" for box_type, _, _ in top_level)
+            has_media_data = any(
+                box_type == b"mdat" and payload_end > payload_start
+                for box_type, payload_start, payload_end in top_level
+            )
+            moov = next(
+                (
+                    (payload_start, payload_end)
+                    for box_type, payload_start, payload_end in top_level
+                    if box_type == b"moov"
+                ),
+                None,
+            )
+            if not has_ftyp or not has_media_data or moov is None:
+                return None
+            moov_children = list(_iter_iso_bmff_boxes(stream, *moov))
+            if not any(box_type == b"trak" for box_type, _, _ in moov_children):
+                return None
+            mvhd = next(
+                (
+                    (payload_start, payload_end)
+                    for box_type, payload_start, payload_end in moov_children
+                    if box_type == b"mvhd"
+                ),
+                None,
+            )
+            if mvhd is None:
+                return None
+            stream.seek(mvhd[0])
+            version_flags = stream.read(4)
+            if len(version_flags) != 4:
+                return None
+            if version_flags[0] == 0:
+                fields = stream.read(16)
+                if len(fields) != 16:
+                    return None
+                timescale = int.from_bytes(fields[8:12], "big")
+                duration = int.from_bytes(fields[12:16], "big")
+            elif version_flags[0] == 1:
+                fields = stream.read(28)
+                if len(fields) != 28:
+                    return None
+                timescale = int.from_bytes(fields[16:20], "big")
+                duration = int.from_bytes(fields[20:28], "big")
+            else:
+                return None
+            if timescale <= 0 or duration <= 0:
+                return None
+            return duration / timescale
+    except OSError:
+        return None
+
+
 def _resolve_project_file(
     project_dir: Path,
     relative_path: object,
@@ -119,6 +247,9 @@ def _resolve_project_file(
 ) -> Path | None:
     if not _is_nonempty_string(relative_path):
         errors.append(f"invalid {label} path: expected non-empty string")
+        return None
+    if Path(relative_path).is_absolute():
+        errors.append(f"unsafe {label} path: {relative_path}")
         return None
     root = project_dir.resolve()
     candidate = (root / relative_path).resolve()
@@ -283,6 +414,16 @@ def _validate_locked_artifacts(
         if target is not None and hash_is_valid and _sha256(target) != expected_hash:
             errors.append(f"{label} sha256 mismatch: {path_value}")
 
+        if role in _GATE_TWO_IMAGE_ROLES and target is not None:
+            if not _is_inside(target, project_dir / "02_character_and_look"):
+                errors.append(
+                    f"{role} path must be inside 02_character_and_look"
+                )
+            if target.stat().st_size == 0:
+                errors.append(f"{role} file is empty: {path_value}")
+            elif not _is_supported_image_file(target):
+                errors.append(f"{role} path must be a supported image file")
+
         if role == "consistency_test":
             duration = artifact.get("duration_seconds")
             if (
@@ -293,6 +434,37 @@ def _validate_locked_artifacts(
                 errors.append(
                     "consistency_test duration_seconds must be between 4 and 6"
                 )
+            if target is not None:
+                if not _is_inside(target, project_dir / "02_character_and_look"):
+                    errors.append(
+                        "consistency_test path must be inside 02_character_and_look"
+                    )
+                if target.stat().st_size == 0:
+                    errors.append(f"consistency_test file is empty: {path_value}")
+                elif target.suffix.lower() not in _CONSISTENCY_MEDIA_SUFFIXES:
+                    errors.append(
+                        "consistency_test path must be an MP4 or MOV media file"
+                    )
+                else:
+                    measured_duration = _read_iso_bmff_duration(target)
+                    if measured_duration is None:
+                        errors.append(
+                            "consistency_test media duration could not be verified "
+                            "from MP4/MOV container"
+                        )
+                    else:
+                        if not 4 <= measured_duration <= 6:
+                            errors.append(
+                                "consistency_test media duration must be between 4 and 6"
+                            )
+                        if (
+                            isinstance(duration, (int, float))
+                            and not isinstance(duration, bool)
+                            and abs(float(duration) - measured_duration) > 0.05
+                        ):
+                            errors.append(
+                                "consistency_test duration_seconds does not match media duration"
+                            )
     return roles
 
 
@@ -311,13 +483,13 @@ def _validate_output_entries(
                 errors.append(f"missing {label} field: {field}")
 
         path_value = output.get("path")
-        if isinstance(path_value, str) and not path_value.replace("\\", "/").startswith(
-            "06_generated_assets/"
-        ):
-            errors.append(f"{label} path must be inside 06_generated_assets")
         target = None
         if "path" in output:
             target = _resolve_project_file(project_dir, path_value, label, errors)
+        if target is not None and not _is_inside(
+            target, project_dir / "06_generated_assets"
+        ):
+            errors.append(f"{label} path must be inside 06_generated_assets")
 
         version = output.get("version")
         if "version" in output and (

@@ -6,8 +6,20 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.validate_project import (
+    GATE_STATUS_MATRIX,
+    GATE_THREE_LOCK_ROLES,
+    GATE_TWO_LOCK_ROLES,
+    SUPPORTED_SCHEMA_VERSION,
+)
 
 
 SCHEMA_VERSION = "1.0"
@@ -65,10 +77,11 @@ def _validate_artifacts(
     artifacts: object,
     required_roles: object,
     errors: list[str],
-) -> None:
+) -> dict[str, dict[str, object]]:
+    records: dict[str, dict[str, object]] = {}
     if not isinstance(artifacts, list):
         errors.append(f"{scenario_id}: artifacts must be a list")
-        return
+        return records
     roles: set[str] = set()
     paths: set[str] = set()
     bundle_root = bundle.resolve()
@@ -107,13 +120,197 @@ def _validate_artifacts(
             errors.append(f"{label}.sha256 must be lowercase SHA-256")
         elif _sha256(target) != expected_hash:
             errors.append(f"{scenario_id}: artifact sha256 mismatch: {path_value}")
+        if isinstance(role, str) and role not in records:
+            records[role] = {
+                "path": path_value,
+                "sha256": expected_hash,
+                "target": target,
+            }
 
     if not isinstance(required_roles, list):
         errors.append(f"{scenario_id}: contract required_artifact_roles must be a list")
-        return
+        return records
     for role in required_roles:
         if role not in roles:
             errors.append(f"{scenario_id}: missing required artifact role: {role}")
+    return records
+
+
+def _validate_project_state(
+    scenario_id: str,
+    bundle: Path,
+    decision: dict,
+    records: dict[str, dict[str, object]],
+    errors: list[str],
+) -> None:
+    record = records.get("project_state")
+    if record is None:
+        return
+    target = record.get("target")
+    if not isinstance(target, Path):
+        return
+    state = _read_json(target, f"{scenario_id}: project state", errors)
+    if not isinstance(state, dict):
+        if state is not None:
+            errors.append(f"{scenario_id}: project state must contain an object")
+        return
+
+    if state.get("schema_version") != SUPPORTED_SCHEMA_VERSION:
+        errors.append(f"{scenario_id}: project state schema_version mismatch")
+    if not _nonempty_string(state.get("project_name")):
+        errors.append(f"{scenario_id}: project state project_name must be non-empty")
+    version = state.get("project_version")
+    if not isinstance(version, str) or re.fullmatch(r"V\d{2,}", version) is None:
+        errors.append(f"{scenario_id}: project state project_version is invalid")
+
+    gate = state.get("current_gate")
+    status = state.get("status")
+    if gate != decision.get("current_gate"):
+        errors.append(f"{scenario_id}: project state current_gate does not match decision")
+    if status != decision.get("status"):
+        errors.append(f"{scenario_id}: project state status does not match decision")
+    if (
+        not isinstance(gate, int)
+        or isinstance(gate, bool)
+        or gate not in GATE_STATUS_MATRIX
+    ):
+        errors.append(f"{scenario_id}: project state current_gate is invalid")
+        gate = None
+    elif not isinstance(status, str) or status not in GATE_STATUS_MATRIX[gate]:
+        errors.append(f"{scenario_id}: project state gate/status transition is invalid")
+
+    if not _timezone_aware(state.get("created_at")):
+        errors.append(f"{scenario_id}: project state created_at is invalid")
+
+    open_decisions = state.get("open_decisions")
+    if not isinstance(open_decisions, list):
+        errors.append(f"{scenario_id}: project state open_decisions must be a list")
+    else:
+        for index, item in enumerate(open_decisions):
+            if not isinstance(item, dict) or any(
+                not _nonempty_string(item.get(field))
+                for field in ("id", "question", "status", "opened_at")
+            ):
+                errors.append(
+                    f"{scenario_id}: project state open_decisions[{index}] is invalid"
+                )
+                continue
+            if item["status"] not in {"open", "resolved"} or not _timezone_aware(
+                item["opened_at"]
+            ):
+                errors.append(
+                    f"{scenario_id}: project state open_decisions[{index}] is invalid"
+                )
+
+    decision_claims = decision.get("claims")
+    real_video_claim = (
+        decision_claims.get("real_video_generated")
+        if isinstance(decision_claims, dict)
+        else None
+    )
+    asset_status = state.get("asset_status")
+    if not isinstance(asset_status, dict) or any(
+        field not in asset_status
+        for field in ("claimed_complete_without_output", "outputs", "qc", "approval")
+    ):
+        errors.append(f"{scenario_id}: project state asset_status is invalid")
+    if isinstance(asset_status, dict) and real_video_claim is False:
+        if asset_status.get("outputs") != []:
+            errors.append(
+                f"{scenario_id}: project state outputs contradict real_video_generated=false"
+            )
+        if asset_status.get("claimed_complete_without_output") is not False:
+            errors.append(f"{scenario_id}: project state false-completion flag is invalid")
+
+    locked = state.get("locked_artifacts")
+    lock_roles: set[str] = set()
+    if not isinstance(locked, list):
+        errors.append(f"{scenario_id}: project state locked_artifacts must be a list")
+    else:
+        bundle_root = bundle.resolve()
+        for index, item in enumerate(locked):
+            label = f"{scenario_id}: project state locked_artifacts[{index}]"
+            if not isinstance(item, dict):
+                errors.append(f"{label} must be an object")
+                continue
+            if any(
+                not _nonempty_string(item.get(field))
+                for field in ("role", "path", "version", "sha256", "reason")
+            ):
+                errors.append(f"{label} requires role, path, version, sha256 and reason")
+                continue
+            role = item["role"]
+            path_value = item["path"]
+            expected_hash = item["sha256"]
+            lock_roles.add(role)
+            if Path(path_value).is_absolute():
+                errors.append(f"{label} path is unsafe")
+                continue
+            lock_target = (bundle_root / path_value).resolve()
+            try:
+                lock_target.relative_to(bundle_root)
+            except ValueError:
+                errors.append(f"{label} path is unsafe")
+                continue
+            if not lock_target.is_file():
+                errors.append(f"{label} file does not exist")
+                continue
+            if _SHA256.fullmatch(expected_hash) is None or _sha256(lock_target) != expected_hash:
+                errors.append(f"{label} sha256 mismatch")
+            record_for_role = records.get(role)
+            if (
+                record_for_role is None
+                or record_for_role.get("path") != path_value
+                or record_for_role.get("sha256") != expected_hash
+            ):
+                errors.append(f"{label} is not mirrored by the decision artifact manifest")
+
+    required_lock_roles: tuple[str, ...] = ()
+    if isinstance(gate, int) and gate >= 2:
+        required_lock_roles = ("project_brief",)
+    if isinstance(gate, int) and gate >= 3:
+        required_lock_roles = GATE_TWO_LOCK_ROLES
+    if isinstance(gate, int) and gate >= 4:
+        required_lock_roles = GATE_TWO_LOCK_ROLES + GATE_THREE_LOCK_ROLES
+    for role in required_lock_roles:
+        if role not in lock_roles:
+            errors.append(
+                f"{scenario_id}: project state Gate {gate} requires locked artifact role: {role}"
+            )
+
+
+def _validate_response_claims(
+    scenario_id: str,
+    bundle: Path,
+    decision: dict,
+    records: dict[str, dict[str, object]],
+    errors: list[str],
+) -> None:
+    try:
+        response = (bundle / "response.md").read_text(encoding="utf-8").casefold()
+    except OSError:
+        return
+    claims = decision.get("claims")
+    if not isinstance(claims, dict):
+        return
+    markers = {
+        "finished_film_generated": "finished_film_generated=true",
+        "real_video_generated": "real_video_generated=true",
+        "model_independent_determinism": "model_independent_determinism=true",
+    }
+    for claim, marker in markers.items():
+        if claims.get(claim) is False and marker in response:
+            errors.append(f"{scenario_id}: response contradicts claim {claim}=false")
+    if claims.get("real_video_generated") is False:
+        forbidden_output_roles = {
+            "finished_film",
+            "generated_video",
+            "video_output",
+        }
+        for role in forbidden_output_roles.intersection(records):
+            errors.append(
+                f"{scenario_id}: artifact role {role} contradicts real_video_generated=false"
+            )
 
 
 def _validate_required_mapping(
@@ -262,13 +459,15 @@ def _validate_scenario(
     ):
         errors.append(f"{scenario_id}: limitations must be non-empty")
 
-    _validate_artifacts(
+    records = _validate_artifacts(
         scenario_id,
         bundle,
         decision.get("artifacts"),
         contract.get("required_artifact_roles"),
         errors,
     )
+    _validate_project_state(scenario_id, bundle, decision, records, errors)
+    _validate_response_claims(scenario_id, bundle, decision, records, errors)
 
 
 def validate_acceptance(contracts_path: Path, results_root: Path) -> list[str]:

@@ -1,8 +1,8 @@
 {
   "scenario_id": "scenario-03",
   "mode": "producer_director",
-  "current_gate": 3,
-  "status": "awaiting_approval",
+  "current_gate": 1,
+  "status": "blocked",
   "execution": {
     "executor": "codex-agent-final-fix-wave",
     "runtime_snapshot": "director-methods-v1.0.0",
@@ -10,14 +10,15 @@
     "isolated": true
   },
   "actions": [
-    "accept_user_statement_of_gate2_approval_as_scenario_input",
+    "record_user_statement_of_gate2_approval_without_promoting_state",
     "create_three_shot_story",
     "create_shot_production_table",
     "create_seedance_generation_plan",
     "request_gate3_approval"
   ],
   "facts": {
-    "gate_two_input_treated_as_user_approved": true,
+    "user_claim_of_gate_two_approval_recorded": true,
+    "validated_project_state_available": false,
     "bulk_generation_started": false,
     "platform_parameters_mixed": false,
     "planned_provider": "Seedance",
@@ -40,7 +41,7 @@
     },
     {
       "kind": "gate_state",
-      "detail": "state records Gate 3 awaiting_approval with generation and external lock verification still open"
+      "detail": "state remains Gate 1 blocked because no external project state or Gate 2 lock evidence is available"
     },
     {
       "kind": "pre_generation_gate",
@@ -61,12 +62,12 @@
     {
       "role": "agent_response",
       "path": "response.md",
-      "sha256": "27ea8c4861c228a25471d5777470fce1d2bb29785a9462b11fc8235ca2bbcb95"
+      "sha256": "58742dcb78f432b51fedc66c09845fc1c4599b55a7c3c557e7c23bc2571f2be5"
     },
     {
       "role": "project_state",
       "path": "artifacts/project-state.json",
-      "sha256": "e98f38a1a407750639a185967364d4463220eb8bb507d3bb78e1ae950516fa18"
+      "sha256": "c5cc853c3aadb8ec26995668d1daa91664a8614a35de663df7008ef7b645a235"
     },
     {
       "role": "story_script",

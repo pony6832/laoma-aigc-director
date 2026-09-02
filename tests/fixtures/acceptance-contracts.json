@@ -79,8 +79,8 @@
     {
       "id": "scenario-03",
       "mode": "producer_director",
-      "allowed_gates": [3],
-      "allowed_statuses": ["awaiting_approval"],
+      "allowed_gates": [1],
+      "allowed_statuses": ["blocked"],
       "required_artifact_roles": [
         "agent_response",
         "project_state",
@@ -89,7 +89,8 @@
         "generation_plan"
       ],
       "required_facts": {
-        "gate_two_input_treated_as_user_approved": true,
+        "user_claim_of_gate_two_approval_recorded": true,
+        "validated_project_state_available": false,
         "bulk_generation_started": false,
         "platform_parameters_mixed": false,
         "planned_provider": "Seedance",
@@ -115,7 +116,7 @@
     {
       "id": "scenario-04",
       "mode": "producer_director",
-      "allowed_gates": [3],
+      "allowed_gates": [1],
       "allowed_statuses": ["blocked"],
       "required_artifact_roles": [
         "agent_response",
@@ -127,6 +128,7 @@
       "required_facts": {
         "changed_shot_ids": ["002"],
         "unchanged_shot_ids": ["001", "003"],
+        "validated_project_state_available": false,
         "source_media_available": false,
         "actual_retry_output_generated": false,
         "single_shot_qc_passed": false,
@@ -158,7 +160,7 @@
     {
       "id": "scenario-05",
       "mode": "producer_director",
-      "allowed_gates": [3],
+      "allowed_gates": [1],
       "allowed_statuses": ["blocked"],
       "required_artifact_roles": [
         "agent_response",
@@ -168,6 +170,7 @@
       ],
       "required_facts": {
         "generation_entry_selected": false,
+        "validated_project_state_available": false,
         "generation_request_sent": false,
         "generation_job_id_recorded": false,
         "parameter_set_assumed": false
@@ -236,7 +239,7 @@
     {
       "id": "scenario-07",
       "mode": "producer_director",
-      "allowed_gates": [3],
+      "allowed_gates": [1],
       "allowed_statuses": ["blocked"],
       "required_artifact_roles": [
         "agent_response",
@@ -247,6 +250,7 @@
       ],
       "required_facts": {
         "actual_tool_invocation_possible": false,
+        "validated_project_state_available": false,
         "real_output_exists": false,
         "generation_job_id_recorded": false,
         "locked_version_overwritten": false,

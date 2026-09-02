@@ -1,4 +1,4 @@
-目前停在 `Gate 3 / blocked`，原因是 `generation_entry_unknown`。我沒有猜 Seedance、H3、ComfyUI 或其他入口，也沒有送出請求、建立 job ID 或產生輸出。
+目前停在 `Gate 1 / blocked`：本隔離輸入沒有可驗證的原專案狀態，且生成入口為 `generation_entry_unknown`。我不猜實際 current Gate，也沒有猜 Seedance、H3、ComfyUI 或其他入口、送出請求、建立 job ID 或產生輸出。
 
 請選定並確認：實際平台／本機工具、帳號與素材外傳權限、模型顯示名稱與版本、支援的素材與比例／時長、成本上限及是否允許生成。收到答案後我會先把單一入口與實際參數寫入版本化方案並再次核准，再從一顆低成本短測開始。
 

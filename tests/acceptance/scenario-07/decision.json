@@ -1,7 +1,7 @@
 {
   "scenario_id": "scenario-07",
   "mode": "producer_director",
-  "current_gate": 3,
+  "current_gate": 1,
   "status": "blocked",
   "execution": {
     "executor": "codex-agent-final-fix-wave",
@@ -18,6 +18,7 @@
   ],
   "facts": {
     "actual_tool_invocation_possible": false,
+    "validated_project_state_available": false,
     "real_output_exists": false,
     "generation_job_id_recorded": false,
     "locked_version_overwritten": false,
@@ -40,7 +41,7 @@
     },
     {
       "kind": "gate_state",
-      "detail": "state stays Gate 3 blocked on tool-unavailable and has no outputs"
+      "detail": "state stays Gate 1 blocked because original project state is absent; tool-unavailable remains open and there are no outputs"
     },
     {
       "kind": "error_record",
@@ -69,12 +70,12 @@
     {
       "role": "agent_response",
       "path": "response.md",
-      "sha256": "10e61fbff2897be5c3225e99be5b851fd7d175330bf532295ba4fa3fa1fa3493"
+      "sha256": "0186ef3115e9207962a503779c723b94a5548fbf2f8e50ac8ec625e4161f6eaa"
     },
     {
       "role": "project_state",
       "path": "artifacts/project-state.json",
-      "sha256": "30f29a4b78a2c1e4a8786ae97b0d8e69ad6f84556551f67a45e9180f953a01aa"
+      "sha256": "17b5217ea65696a7aac863f05811dc3a55000c7de48cb729c1e29eccd9323098"
     },
     {
       "role": "error_record",

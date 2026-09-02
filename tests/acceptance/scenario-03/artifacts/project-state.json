@@ -2,13 +2,13 @@
   "schema_version": "1.0",
   "project_name": "雨巷紙船三鏡",
   "project_version": "V01",
-  "current_gate": 3,
-  "status": "awaiting_approval",
+  "current_gate": 1,
+  "status": "blocked",
   "locked_artifacts": [],
   "open_decisions": [
     {
       "id": "gate3-approval",
-      "question": "請核准三鏡頭導演方案；核准前不生成。",
+      "question": "先提供可驗證的原專案與 Gate 2 鎖定證據；驗證後再提交三鏡頭方案核准。",
       "status": "open",
       "opened_at": "2026-09-02T19:26:06+08:00"
     },
@@ -29,7 +29,7 @@
       "checks": []
     },
     "approval": {
-      "status": "pending",
+      "status": "not_requested",
       "approved_at": null,
       "approved_by": "",
       "scope": []

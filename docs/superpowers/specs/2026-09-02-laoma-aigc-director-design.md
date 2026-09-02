@@ -105,7 +105,7 @@ Agent 盤點素材並區分「可直接觀察」「創作推定」「需要決�
 
 ### Gate 2｜角色與影像鎖定
 
-Agent 建立角色事實檔、服裝與道具規則、場景、色彩、燈光、材質、焦段與畫面質感；交付角色總覽板、定裝／主視覺、無角色場景參考板，以及 4–6 秒一致性短測方案。長片、多人案或真人角色未通過短測時，不進入大量生成。
+Agent 建立角色事實檔、服裝與道具規則、場景、色彩、燈光、材質、焦段與畫面質感；在 `02_character_and_look/` 交付非空、可辨識的角色總覽圖、定裝／主視覺、無角色場景參考圖，以及可由 MP4／MOV 容器驗證為 4–6 秒的實際一致性短測。文字計畫、空檔與自行宣告時長不能代替媒體；長片、多人案或真人角色未通過短測時，不進入大量生成。
 
 ### Gate 3｜導演方案鎖定
 
@@ -120,7 +120,7 @@ Agent 使用當前可用且符合授權範圍的工具生成資產，檢查人�
 - Gate 1–3 可用 `draft|awaiting_approval|approved|blocked`，不可用 `complete`。
 - Gate 4 可用 `draft|awaiting_approval|blocked|complete`；實體輸出、QC 與核准完整後直接完成，不使用含義重疊的 `approved`。
 - 進入下一 Gate 代表上一 Gate 已核准，必須能以結構化鎖定產物證明。
-- Gate 4 `complete` 必須具備 `06_generated_assets/` 內非空輸出、匹配輸出雜湊、非空白 generation report、全數通過且有證據的 QC、具名／含時區／有範圍的核准、無未決事項，以及 `claimed_complete_without_output=false`。
+- Gate 4 `complete` 必須具備路徑正規化後仍位於 `06_generated_assets/` 的非空輸出、匹配輸出雜湊、非空白 generation report、全數通過且有證據的 QC、具名／含時區／有範圍的核准、無未決事項，以及 `claimed_complete_without_output=false`。
 
 ## 5. 資訊與決策優先序
 
@@ -169,7 +169,7 @@ Agent 使用當前可用且符合授權範圍的工具生成資產，檢查人�
 - Skill frontmatter、名稱、連結與 `agents/openai.yaml` 通過技能驗證器。
 - `init_project.py` 可重複建立案件，不覆蓋既有版本。
 - `validate_project.py` 能辨識缺少的 Gate 產物、錯誤版本引用和未通過狀態。
-- `validate_project.py` 驗證精確 schema、Gate/status 矩陣、目錄版本、含時區時間、鎖定檔安全路徑與 SHA-256，以及 Gate 4 的實體輸出、QC、核准和假完成旗標；不可用固定文字或空白模板作為完成證據。
+- `validate_project.py` 驗證精確 schema、Gate/status 矩陣、目錄版本、含時區時間、鎖定檔安全路徑與 SHA-256，Gate 2 的圖像型別、MP4／MOV 結構與實際時長，以及 Gate 4 正規化後的輸出路徑、實體輸出、QC、核准和假完成旗標；不可用固定文字、空白模板或自行宣告的時長作為完成證據。
 - `sync_skill.py` 在本次複製、manifest 或推進失敗時清除本次 staging；若既有安裝已改名而推進失敗，還原舊安裝。成功替換後保留時間戳備份。
 
 ### 行為情境
@@ -183,6 +183,8 @@ Agent 使用當前可用且符合授權範圍的工具生成資產，檢查人�
 5. Seedance、H3 或 ComfyUI 入口不明。
 6. 真人肖像或聲音授權不明。
 7. 工具不可用但仍需完整生成包。
+
+每案的決策宣告必須與同 bundle 的 `project-state.json`、鎖定角色、相對路徑及雜湊交叉驗證。缺少真實案件狀態或前一 Gate 鎖定證據時，可交付目標 Gate 的製作包，但實際 `current_gate` 不得被自述推進；回覆也不得與 `real_video_generated=false`、`finished_film_generated=false` 等結構化聲明矛盾。
 
 七案必須由執行 Agent 讀取最終 runtime 指示後，在隔離目錄實際產生 response／artifact bundle。另一個標準函式庫 validator 依每案的模式、Gate、狀態、必要產物與雜湊、禁止行為和完成證據驗收；驗證重點是決策與產物，不測固定措辭，也不宣稱模型行為與實際影片生成具模型無關的決定性。
 

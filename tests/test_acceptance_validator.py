@@ -27,6 +27,33 @@ def _valid_fixture(root: Path) -> tuple[Path, Path]:
     (bundle / "request.md").write_text("A real request\n", encoding="utf-8")
     (bundle / "response.md").write_text("A gate-aware response\n", encoding="utf-8")
     (artifacts / "brief.md").write_text("A non-empty brief\n", encoding="utf-8")
+    state = {
+        "schema_version": "1.0",
+        "project_name": "fixture",
+        "project_version": "V01",
+        "current_gate": 1,
+        "status": "awaiting_approval",
+        "locked_artifacts": [],
+        "open_decisions": [],
+        "asset_status": {
+            "claimed_complete_without_output": False,
+            "outputs": [],
+            "qc": {
+                "status": "not_started",
+                "checked_at": None,
+                "checked_by": "",
+                "checks": [],
+            },
+            "approval": {
+                "status": "pending",
+                "approved_at": None,
+                "approved_by": "",
+                "scope": [],
+            },
+        },
+        "created_at": "2026-09-02T13:00:00+08:00",
+    }
+    _write_json(artifacts / "project-state.json", state)
     contracts = {
         "schema_version": "1.0",
         "scenarios": [
@@ -35,7 +62,11 @@ def _valid_fixture(root: Path) -> tuple[Path, Path]:
                 "mode": "producer_director",
                 "allowed_gates": [1],
                 "allowed_statuses": ["awaiting_approval"],
-                "required_artifact_roles": ["agent_response", "project_brief"],
+                "required_artifact_roles": [
+                    "agent_response",
+                    "project_state",
+                    "project_brief",
+                ],
                 "required_facts": {
                     "prior_case_data_used": False,
                     "bulk_generation_started": False,
@@ -92,6 +123,11 @@ def _valid_fixture(root: Path) -> tuple[Path, Path]:
                 "role": "project_brief",
                 "path": "artifacts/brief.md",
                 "sha256": _sha256(artifacts / "brief.md"),
+            },
+            {
+                "role": "project_state",
+                "path": "artifacts/project-state.json",
+                "sha256": _sha256(artifacts / "project-state.json"),
             },
         ],
     }
@@ -189,6 +225,76 @@ class AcceptanceValidatorTests(unittest.TestCase):
                 "scenario-01: missing completion evidence kind: artifact_hashes", errors
             )
             self.assertIn("scenario-01: limitations must be non-empty", errors)
+
+    def test_rejects_project_state_that_disagrees_with_decision(self):
+        with TemporaryDirectory() as tmp:
+            contracts, results = _valid_fixture(Path(tmp))
+            bundle = results / "scenario-01"
+            state_path = bundle / "artifacts" / "project-state.json"
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            state["status"] = "blocked"
+            _write_json(state_path, state)
+            decision_path = bundle / "decision.json"
+            decision = json.loads(decision_path.read_text(encoding="utf-8"))
+            for artifact in decision["artifacts"]:
+                if artifact["role"] == "project_state":
+                    artifact["sha256"] = _sha256(state_path)
+            _write_json(decision_path, decision)
+            self.assertIn(
+                "scenario-01: project state status does not match decision",
+                validate_acceptance(contracts, results),
+            )
+
+    def test_rejects_project_state_that_skips_prior_gate_locks(self):
+        with TemporaryDirectory() as tmp:
+            contracts_path, results = _valid_fixture(Path(tmp))
+            contracts = json.loads(contracts_path.read_text(encoding="utf-8"))
+            contracts["scenarios"][0]["allowed_gates"] = [3]
+            contracts["scenarios"][0]["allowed_statuses"] = ["blocked"]
+            _write_json(contracts_path, contracts)
+            bundle = results / "scenario-01"
+            state_path = bundle / "artifacts" / "project-state.json"
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            state["current_gate"] = 3
+            state["status"] = "blocked"
+            _write_json(state_path, state)
+            decision_path = bundle / "decision.json"
+            decision = json.loads(decision_path.read_text(encoding="utf-8"))
+            decision["current_gate"] = 3
+            decision["status"] = "blocked"
+            for artifact in decision["artifacts"]:
+                if artifact["role"] == "project_state":
+                    artifact["sha256"] = _sha256(state_path)
+            _write_json(decision_path, decision)
+            errors = validate_acceptance(contracts_path, results)
+            self.assertIn(
+                "scenario-01: project state Gate 3 requires locked artifact role: project_brief",
+                errors,
+            )
+            self.assertIn(
+                "scenario-01: project state Gate 3 requires locked artifact role: consistency_test",
+                errors,
+            )
+
+    def test_rejects_response_that_contradicts_false_completion_claim(self):
+        with TemporaryDirectory() as tmp:
+            contracts, results = _valid_fixture(Path(tmp))
+            bundle = results / "scenario-01"
+            response_path = bundle / "response.md"
+            response_path.write_text(
+                "A gate-aware response\nfinished_film_generated=true\n",
+                encoding="utf-8",
+            )
+            decision_path = bundle / "decision.json"
+            decision = json.loads(decision_path.read_text(encoding="utf-8"))
+            for artifact in decision["artifacts"]:
+                if artifact["role"] == "agent_response":
+                    artifact["sha256"] = _sha256(response_path)
+            _write_json(decision_path, decision)
+            self.assertIn(
+                "scenario-01: response contradicts claim finished_film_generated=false",
+                validate_acceptance(contracts, results),
+            )
 
     def test_checked_in_seven_scenario_bundles_pass(self):
         errors = validate_acceptance(

@@ -23,6 +23,25 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _iso_box(box_type: bytes, payload: bytes = b"") -> bytes:
+    return (len(payload) + 8).to_bytes(4, "big") + box_type + payload
+
+
+def _minimal_iso_bmff(duration_seconds: float) -> bytes:
+    timescale = 1_000
+    duration = round(duration_seconds * timescale)
+    ftyp = _iso_box(b"ftyp", b"isom\x00\x00\x00\x00isomiso2")
+    mvhd_fields = (
+        b"\x00\x00\x00\x00"
+        + (0).to_bytes(4, "big")
+        + (0).to_bytes(4, "big")
+        + timescale.to_bytes(4, "big")
+        + duration.to_bytes(4, "big")
+    )
+    moov = _iso_box(b"moov", _iso_box(b"mvhd", mvhd_fields) + _iso_box(b"trak"))
+    return ftyp + moov + _iso_box(b"mdat", b"frame-fixture")
+
+
 def _locked_artifact(
     project: Path,
     path: str,
@@ -60,19 +79,19 @@ def _prepare_gate_two(project: Path) -> list[dict]:
             project,
             "02_character_and_look/CHARACTER_OVERVIEW_BOARD_v01.png",
             "character_overview_board",
-            content=b"character-board",
+            content=b"\x89PNG\r\n\x1a\ncharacter-board-fixture",
         ),
         _locked_artifact(
             project,
             "02_character_and_look/SCENE_REFERENCE_BOARD_v01.png",
             "character_free_scene_board",
-            content=b"scene-board-without-character",
+            content=b"\x89PNG\r\n\x1a\nscene-board-without-character-fixture",
         ),
         _locked_artifact(
             project,
             "02_character_and_look/CONSISTENCY_TEST_v01.mp4",
             "consistency_test",
-            content=b"four-to-six-second-test",
+            content=_minimal_iso_bmff(5.0),
             duration_seconds=5.0,
         ),
     ]
@@ -292,6 +311,114 @@ class ValidateProjectTests(unittest.TestCase):
                 validate_project(project),
             )
 
+    def test_gate_two_rejects_empty_consistency_test_output(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            target = project / locked[-1]["path"]
+            target.write_bytes(b"")
+            locked[-1]["sha256"] = _sha256(target)
+            state = _read_json(project / "PROJECT_STATE.json")
+            state.update(
+                {"current_gate": 2, "status": "approved", "locked_artifacts": locked}
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "consistency_test file is empty: 02_character_and_look/CONSISTENCY_TEST_v01.mp4",
+                validate_project(project),
+            )
+
+    def test_gate_two_rejects_text_plan_as_consistency_test_output(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            locked[-1] = _locked_artifact(
+                project,
+                "02_character_and_look/CONSISTENCY_TEST_PLAN_v01.md",
+                "consistency_test",
+                content=b"# five-second plan, not media\n",
+                duration_seconds=5.0,
+            )
+            state = _read_json(project / "PROJECT_STATE.json")
+            state.update(
+                {"current_gate": 2, "status": "approved", "locked_artifacts": locked}
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "consistency_test path must be an MP4 or MOV media file",
+                validate_project(project),
+            )
+
+    def test_gate_two_rejects_fabricated_duration_for_invalid_media(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            target = project / locked[-1]["path"]
+            target.write_bytes(b"not-an-iso-bmff-media-container")
+            locked[-1]["sha256"] = _sha256(target)
+            state = _read_json(project / "PROJECT_STATE.json")
+            state.update(
+                {"current_gate": 2, "status": "approved", "locked_artifacts": locked}
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "consistency_test media duration could not be verified from MP4/MOV container",
+                validate_project(project),
+            )
+
+    def test_gate_two_rejects_declared_duration_that_disagrees_with_media(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            locked[-1]["duration_seconds"] = 4.5
+            state = _read_json(project / "PROJECT_STATE.json")
+            state.update(
+                {"current_gate": 2, "status": "approved", "locked_artifacts": locked}
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "consistency_test duration_seconds does not match media duration",
+                validate_project(project),
+            )
+
+    def test_gate_two_rejects_markdown_plan_as_character_board(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            locked[3] = _locked_artifact(
+                project,
+                "02_character_and_look/CHARACTER_OVERVIEW_BOARD_PLAN_v01.md",
+                "character_overview_board",
+                content=b"# board plan, not an image\n",
+            )
+            state = _read_json(project / "PROJECT_STATE.json")
+            state.update(
+                {"current_gate": 2, "status": "approved", "locked_artifacts": locked}
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "character_overview_board path must be a supported image file",
+                validate_project(project),
+            )
+
+    def test_gate_two_rejects_empty_scene_board(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            locked = _prepare_gate_two(project)
+            target = project / locked[4]["path"]
+            target.write_bytes(b"")
+            locked[4]["sha256"] = _sha256(target)
+            state = _read_json(project / "PROJECT_STATE.json")
+            state.update(
+                {"current_gate": 2, "status": "approved", "locked_artifacts": locked}
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "character_free_scene_board file is empty: "
+                "02_character_and_look/SCENE_REFERENCE_BOARD_v01.png",
+                validate_project(project),
+            )
+
     def test_locked_artifact_rejects_unsafe_path(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -391,6 +518,24 @@ class ValidateProjectTests(unittest.TestCase):
             _write_json(project / "PROJECT_STATE.json", state)
             self.assertIn(
                 "asset_status.outputs[0] sha256 mismatch: 06_generated_assets/final_v01.mp4",
+                validate_project(project),
+            )
+
+    def test_gate_four_rejects_normalized_traversal_out_of_generated_assets(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state = _prepare_complete_gate_four(project)
+            (project / "06_generated_assets" / "final_v01.mp4").unlink()
+            brief = project / "PROJECT_BRIEF.md"
+            state["asset_status"]["outputs"][0].update(
+                {
+                    "path": "06_generated_assets/../PROJECT_BRIEF.md",
+                    "sha256": _sha256(brief),
+                }
+            )
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "asset_status.outputs[0] path must be inside 06_generated_assets",
                 validate_project(project),
             )
 

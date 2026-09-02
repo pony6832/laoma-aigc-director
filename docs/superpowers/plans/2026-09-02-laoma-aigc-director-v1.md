@@ -808,4 +808,4 @@ git commit -m "chore: verify and install AIGC director V1"
 git status --short --branch
 ```
 
-Expected: `## main`，沒有未提交檔案。
+Expected: `## feature/laoma-aigc-director-v1`，沒有未提交檔案；完成整體審查後再決定是否合併到 `main`。

@@ -1,0 +1,106 @@
+{
+  "scenario_id": "scenario-02",
+  "mode": "producer_director",
+  "current_gate": 2,
+  "status": "awaiting_approval",
+  "execution": {
+    "executor": "codex-agent-final-fix-wave",
+    "runtime_snapshot": "director-methods-v1.0.0",
+    "executed_at": "2026-09-02T19:26:06+08:00",
+    "isolated": true
+  },
+  "actions": [
+    "record_textual_character_anchors",
+    "create_character_profile_draft",
+    "create_gate2_output_specifications",
+    "request_source_binary_and_generation_entry"
+  ],
+  "facts": {
+    "prior_case_data_used": false,
+    "source_binary_available": false,
+    "character_overview_board_generated": false,
+    "character_free_scene_board_generated": false,
+    "consistency_test_generated": false,
+    "bulk_generation_started": false
+  },
+  "forbidden_behavior": {
+    "reused_prior_character": false,
+    "treated_plan_as_visual_output": false,
+    "claimed_gate2_approved": false
+  },
+  "claims": {
+    "finished_film_generated": false,
+    "real_video_generated": false,
+    "model_independent_determinism": false
+  },
+  "completion_evidence": [
+    {
+      "kind": "artifact_hashes",
+      "detail": "all response, state, profile, Bible and Gate 2 specification files have matching SHA-256 entries"
+    },
+    {
+      "kind": "gate_state",
+      "detail": "project-state.json stays at Gate 2 awaiting_approval and records both open blockers"
+    },
+    {
+      "kind": "source_boundary",
+      "detail": "request, profile and state explicitly record that the referenced image binary and source hash are unavailable"
+    },
+    {
+      "kind": "gate2_output_boundary",
+      "detail": "three distinct specifications define the real overview board, character-free scene board and 5-second test while recording that none was generated"
+    }
+  ],
+  "limitations": [
+    "No source image binary or generation tool was provided, so visual identity could not be inspected and Gate 2 outputs were not generated.",
+    "The specification files are not visual outputs, approvals or evidence of continuity.",
+    "The deterministic validator checks the captured bundle, not future model behavior."
+  ],
+  "artifacts": [
+    {
+      "role": "scenario_request",
+      "path": "request.md",
+      "sha256": "d3d008204ecaea019e0b03dce366729b0f50bf0621198913e539641697778af8"
+    },
+    {
+      "role": "agent_response",
+      "path": "response.md",
+      "sha256": "fcf1704c902097f209285174aae0df40b9fd4dbe785e8a0745a928441bdc86da"
+    },
+    {
+      "role": "project_state",
+      "path": "artifacts/project-state.json",
+      "sha256": "2539d4c3ecc6aa0db528748bd18d97fd2db34b3ef1c88720ef3b6640e44845a3"
+    },
+    {
+      "role": "project_brief",
+      "path": "artifacts/project-brief.md",
+      "sha256": "b01f9038fe22db1aae72994799ac4013bb72770ce2a185d48b4fcac58a52973d"
+    },
+    {
+      "role": "character_profile",
+      "path": "artifacts/character-profile.json",
+      "sha256": "271fa0291e0ac125f44e60f1226388bf16a390f8645e9f17c2d245a3b94551bc"
+    },
+    {
+      "role": "production_bible",
+      "path": "artifacts/production-bible.md",
+      "sha256": "45914df826c914cc17c2004231215a260de16f75cea783ef7c4300d826135df6"
+    },
+    {
+      "role": "character_overview_board_spec",
+      "path": "artifacts/character-overview-board-spec.md",
+      "sha256": "e913fc20c709421e3c2fb435dded606777fe32a63ecca962d49e63f3aa7cb53c"
+    },
+    {
+      "role": "character_free_scene_board_spec",
+      "path": "artifacts/character-free-scene-board-spec.md",
+      "sha256": "863890235c35d550fb11c39b13751dbb4524ab39cf4a0c8de6b7984b9d625a7b"
+    },
+    {
+      "role": "consistency_test_plan",
+      "path": "artifacts/consistency-test-plan.md",
+      "sha256": "122552e10d1f47922642462f0f6ea9d732a03f3b451378adc337c4c894fc4dba"
+    }
+  ]
+}

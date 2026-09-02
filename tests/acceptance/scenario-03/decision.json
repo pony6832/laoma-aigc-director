@@ -1,0 +1,87 @@
+{
+  "scenario_id": "scenario-03",
+  "mode": "producer_director",
+  "current_gate": 3,
+  "status": "awaiting_approval",
+  "execution": {
+    "executor": "codex-agent-final-fix-wave",
+    "runtime_snapshot": "director-methods-v1.0.0",
+    "executed_at": "2026-09-02T19:26:06+08:00",
+    "isolated": true
+  },
+  "actions": [
+    "accept_user_statement_of_gate2_approval_as_scenario_input",
+    "create_three_shot_story",
+    "create_shot_production_table",
+    "create_seedance_generation_plan",
+    "request_gate3_approval"
+  ],
+  "facts": {
+    "gate_two_input_treated_as_user_approved": true,
+    "bulk_generation_started": false,
+    "platform_parameters_mixed": false,
+    "planned_provider": "Seedance",
+    "shot_count": 3
+  },
+  "forbidden_behavior": {
+    "bulk_generated_before_gate3_approval": false,
+    "mixed_platform_parameters": false,
+    "claimed_finished_film": false
+  },
+  "claims": {
+    "finished_film_generated": false,
+    "real_video_generated": false,
+    "model_independent_determinism": false
+  },
+  "completion_evidence": [
+    {
+      "kind": "artifact_hashes",
+      "detail": "request, response, state, story, shot table and Seedance plan are non-empty and SHA-256 enumerated"
+    },
+    {
+      "kind": "gate_state",
+      "detail": "state records Gate 3 awaiting_approval with generation and external lock verification still open"
+    },
+    {
+      "kind": "pre_generation_gate",
+      "detail": "response and plan require Gate 3 approval and live Seedance entry validation before any request"
+    }
+  ],
+  "limitations": [
+    "The external approved Gate 2 files and hashes were not included in this isolated bundle and must be loaded before real execution.",
+    "No Seedance entry was opened and no image, audio, job, preview or video was generated.",
+    "The validator proves document invariants only, not artistic quality or model-independent behavior."
+  ],
+  "artifacts": [
+    {
+      "role": "scenario_request",
+      "path": "request.md",
+      "sha256": "41a421bd73bfbf909a85a0745e9e4efb56f8c09d548a5d03317de4d47a52abf7"
+    },
+    {
+      "role": "agent_response",
+      "path": "response.md",
+      "sha256": "27ea8c4861c228a25471d5777470fce1d2bb29785a9462b11fc8235ca2bbcb95"
+    },
+    {
+      "role": "project_state",
+      "path": "artifacts/project-state.json",
+      "sha256": "e98f38a1a407750639a185967364d4463220eb8bb507d3bb78e1ae950516fa18"
+    },
+    {
+      "role": "story_script",
+      "path": "artifacts/story-script.md",
+      "sha256": "9876a42492ea59d60a895482fa66fac33bf269790128d5cac1a718d0cfe7f76f"
+    },
+    {
+      "role": "shot_production_table",
+      "path": "artifacts/shot-production-table.md",
+      "sha256": "9941fc62e9ac9355491427217a603a81f40df9013b590c42a29829f0f5af7759"
+    },
+    {
+      "role": "generation_plan",
+      "path": "artifacts/seedance-generation-plan.md",
+      "sha256": "bb1608f6b6277299248e06aa2f56adbc9cd8ec28a46b89e20a55a6b05488febc"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "scenario_id": "scenario-04",
+  "mode": "producer_director",
+  "current_gate": 3,
+  "status": "blocked",
+  "execution": {
+    "executor": "codex-agent-final-fix-wave",
+    "runtime_snapshot": "director-methods-v1.0.0",
+    "executed_at": "2026-09-02T19:26:06+08:00",
+    "isolated": true
+  },
+  "actions": [
+    "classify_shot_002_failure",
+    "freeze_shots_001_and_003",
+    "create_single_variable_shot_002_revision",
+    "define_versioned_retry_and_rollback",
+    "request_source_project"
+  ],
+  "facts": {
+    "changed_shot_ids": ["002"],
+    "unchanged_shot_ids": ["001", "003"],
+    "source_media_available": false,
+    "actual_retry_output_generated": false,
+    "single_shot_qc_passed": false,
+    "prior_artifacts_overwritten": false
+  },
+  "forbidden_behavior": {
+    "overwrote_prior_version": false,
+    "regenerated_unaffected_shots": false,
+    "claimed_qc_passed_without_media": false
+  },
+  "claims": {
+    "finished_film_generated": false,
+    "real_video_generated": false,
+    "model_independent_determinism": false
+  },
+  "completion_evidence": [
+    {
+      "kind": "artifact_hashes",
+      "detail": "request, response, state, QC classification, revision and preservation record have verified hashes"
+    },
+    {
+      "kind": "gate_state",
+      "detail": "state remains Gate 3 blocked pending the real project and shot media"
+    },
+    {
+      "kind": "scope_control",
+      "detail": "facts and revision name only S002 as changed and freeze S001 and S003"
+    },
+    {
+      "kind": "version_preservation",
+      "detail": "preservation record requires additive S002 v02, before-after hashes and rollback to v01"
+    },
+    {
+      "kind": "no_output",
+      "detail": "facts, response and QC record state that no retry media exists and QC has not passed"
+    }
+  ],
+  "limitations": [
+    "No source project, locked hashes, failed shot file or Seedance entry was available, so the retry could not be executed or visually checked.",
+    "The preservation record expresses the authorized future mutation scope; it is not evidence that external S001 or S003 files were inspected.",
+    "No paid-platform generation or finished-film validation occurred."
+  ],
+  "artifacts": [
+    {
+      "role": "scenario_request",
+      "path": "request.md",
+      "sha256": "bbdd9d59f72ca72296be6ff433a82d3457938edc1edeb2289e3be195c3292b32"
+    },
+    {
+      "role": "agent_response",
+      "path": "response.md",
+      "sha256": "addadc1cf45b6eae7da6495e384008f91fb01dd44d586825aa5b96e81b882d75"
+    },
+    {
+      "role": "project_state",
+      "path": "artifacts/project-state.json",
+      "sha256": "2797280343860d04cfc4396339a1393608c6a398fb7969db05cd83295ecfb510"
+    },
+    {
+      "role": "failure_qc",
+      "path": "artifacts/failure-qc.md",
+      "sha256": "c47f4a8182580d4041da9e6542d01974cfca09e6025d84c92dcfd4235a12fde3"
+    },
+    {
+      "role": "shot_revision_prompt",
+      "path": "artifacts/shot-002-revision-prompt.md",
+      "sha256": "6a8ca51a00c8225b6a06887adb2e3f815a0fec17b7b94c4998686b326c34cdd8"
+    },
+    {
+      "role": "version_preservation_record",
+      "path": "artifacts/version-preservation-record.md",
+      "sha256": "c7a68d56e821a3e7b70756acbbc9beaf21edc219299c1b0133da70e0a06b6969"
+    }
+  ]
+}

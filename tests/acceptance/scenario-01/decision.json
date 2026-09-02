@@ -1,0 +1,72 @@
+{
+  "scenario_id": "scenario-01",
+  "mode": "producer_director",
+  "current_gate": 1,
+  "status": "awaiting_approval",
+  "execution": {
+    "executor": "codex-agent-final-fix-wave",
+    "runtime_snapshot": "director-methods-v1.0.0",
+    "executed_at": "2026-09-02T19:26:06+08:00",
+    "isolated": true
+  },
+  "actions": [
+    "record_current_request",
+    "create_gate1_brief",
+    "request_direction_approval"
+  ],
+  "facts": {
+    "prior_case_data_used": false,
+    "bulk_generation_started": false,
+    "current_input_count": 0,
+    "needs_direction_approval": true
+  },
+  "forbidden_behavior": {
+    "reused_prior_character": false,
+    "claimed_finished_film": false
+  },
+  "claims": {
+    "finished_film_generated": false,
+    "real_video_generated": false,
+    "model_independent_determinism": false
+  },
+  "completion_evidence": [
+    {
+      "kind": "artifact_hashes",
+      "detail": "request, response, project state and Gate 1 brief are non-empty and independently SHA-256 listed"
+    },
+    {
+      "kind": "gate_state",
+      "detail": "project-state.json records Gate 1 awaiting_approval with an open direction decision"
+    },
+    {
+      "kind": "input_boundary",
+      "detail": "brief and facts record zero media inputs and no prior-case reuse"
+    }
+  ],
+  "limitations": [
+    "This exercise produced planning documents only; no image, audio, paid-platform request or video output was created.",
+    "The deterministic validator checks recorded invariants and hashes, not model-independent Agent behavior."
+  ],
+  "artifacts": [
+    {
+      "role": "scenario_request",
+      "path": "request.md",
+      "sha256": "f568cf059c59f1f312d94359c6d4814b6f8809a150cda0529420660281bfa332"
+    },
+    {
+      "role": "agent_response",
+      "path": "response.md",
+      "sha256": "ea6b55036cdb93f317a4d88c47f182f0ec1cb9220cd47547b272612dd74942ef"
+    },
+    {
+      "role": "project_state",
+      "path": "artifacts/project-state.json",
+      "sha256": "c7ffb2b0984898727ddd024a8e71f3265b081a2f6600a73491b7009b207c8b41"
+    },
+    {
+      "role": "project_brief",
+      "path": "artifacts/project-brief.md",
+      "sha256": "de4493bbc91a192b4eca9b8e6595300f92338528ad91ca242e07e8be945e4654"
+    }
+  ]
+}

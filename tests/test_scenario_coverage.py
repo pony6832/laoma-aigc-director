@@ -21,7 +21,18 @@ class ScenarioCoverageTests(unittest.TestCase):
         )
         scenario_expectations = (
             ("一句故事點子", ("Gate 1", "brief", "禁止偷用舊角色", "pending_approval")),
-            ("一張虛構角色圖", ("Gate 2", "CHARACTER_PROFILE.json", "禁止補入任何舊案件角色", "核准")),
+            (
+                "一張虛構角色圖",
+                (
+                    "Gate 2",
+                    "CHARACTER_PROFILE.json",
+                    "角色總覽板",
+                    "無角色場景參考板",
+                    "4–6 秒一致性短測",
+                    "禁止補入任何舊案件角色",
+                    "核准",
+                ),
+            ),
             ("已核准角色圖", ("Gate 3", "Seedance", "跳過 Gate 3", "gate: 3 / approved")),
             ("只改一顆失敗鏡頭", ("失敗回復模式", "只新增第二鏡頭修正版", "覆蓋舊版", "單鏡 QC")),
             ("生成入口不明", ("阻擋模式", "generation_entry_unknown", "不猜測平台", "沒有生成 job ID")),

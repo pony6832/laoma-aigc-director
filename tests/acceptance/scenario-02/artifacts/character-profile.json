@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "profile_version": "v01",
+  "status": "draft",
+  "identity": {
+    "name": "藍雨衣小狐狸（暫名）",
+    "type": "fictional_claim_pending_source_file",
+    "anchors": ["狐狸耳朵輪廓", "藍色雨衣", "黃色小包"]
+  },
+  "appearance": {
+    "face": ["待收到原圖後觀察，不從文字猜測五官"],
+    "hair": ["不適用；毛色與毛流待原圖"],
+    "body_proportions": ["待原圖"]
+  },
+  "wardrobe": [
+    {"item": "雨衣", "color": "藍色", "status": "使用者指定；視覺細節待核對"}
+  ],
+  "props": [
+    {"item": "小包", "color": "黃色", "status": "使用者指定；形狀與背法待核對"}
+  ],
+  "performance": ["產品感、動作幅度小；仍屬創作推定"],
+  "reference_roles": [
+    {
+      "reference": "未附帶的本次虛構角色圖",
+      "primary_role": "角色身分與定裝",
+      "must_not_transfer": ["背景", "未確認文字", "其他角色"],
+      "source_sha256": null,
+      "rights_status": "user_claimed_usable_not_verified_in_bundle"
+    }
+  ],
+  "locked_fields": [],
+  "assumptions": ["角色為虛構", "實際圖檔尚未提供給本次驗收"],
+  "source_hashes": []
+}

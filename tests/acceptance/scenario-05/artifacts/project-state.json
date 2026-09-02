@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "project_name": "入口待定生成案",
+  "project_version": "V01",
+  "current_gate": 3,
+  "status": "blocked",
+  "locked_artifacts": [],
+  "open_decisions": [
+    {
+      "id": "generation-entry-unknown",
+      "question": "請選定實際可操作的生成入口、帳號權利、模型、參數與成本上限。",
+      "status": "open",
+      "opened_at": "2026-09-02T19:26:06+08:00"
+    }
+  ],
+  "asset_status": {
+    "claimed_complete_without_output": false,
+    "outputs": [],
+    "qc": {
+      "status": "not_started",
+      "checked_at": null,
+      "checked_by": "",
+      "checks": []
+    },
+    "approval": {
+      "status": "not_requested",
+      "approved_at": null,
+      "approved_by": "",
+      "scope": []
+    }
+  },
+  "created_at": "2026-09-02T19:26:06+08:00"
+}

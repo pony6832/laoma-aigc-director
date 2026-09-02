@@ -56,7 +56,13 @@ class InitProjectTests(unittest.TestCase):
 
     def test_rejects_invalid_project_names(self):
         with TemporaryDirectory() as tmp:
-            for name in ("", ".", "..", "bad/name", "bad\\name", "bad:name", "bad*name", "bad?name"):
+            invalid_names = (
+                "", ".", "..", "bad/name", "bad\\name",
+                *(f"bad{character}name" for character in '<>:"/\\|?*'),
+                "bad\x00name", "bad\x01name", "bad\x1fname",
+                "bad.", "bad ", "CON", "PRN.txt", "AUX", "NUL", "COM1", "LPT9",
+            )
+            for name in invalid_names:
                 with self.subTest(name=name), self.assertRaisesRegex(ValueError, "project_name"):
                     create_project(Path(tmp), name)
 

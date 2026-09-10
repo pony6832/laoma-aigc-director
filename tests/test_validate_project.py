@@ -685,6 +685,152 @@ class ValidateProjectTests(unittest.TestCase):
                 _write_json(state_path, state)
                 self.assertIn("invalid project status: expected str", validate_project(project))
 
+    def test_nested_unhashable_status_and_role_values_return_diagnostics(self):
+        cases = (
+            (("open_decisions", 0, "status"), "invalid open_decisions[0].status"),
+            (("asset_status", "qc", "status"), "invalid asset_status.qc.status"),
+            (("asset_status", "qc", "checks", 0, "status"),
+             "invalid asset_status.qc.checks[0].status"),
+            (("asset_status", "approval", "status"), "invalid asset_status.approval.status"),
+            (("locked_artifacts", 0, "role"), "invalid locked_artifacts[0].role"),
+        )
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            for fields, expected in cases:
+                for value in ([], {}, ["approved"], {"status": "approved"}):
+                    with self.subTest(fields=fields, value=value):
+                        state = _prepare_complete_gate_four(project)
+                        state["open_decisions"] = [{
+                            "id": "D001", "question": "Pending decision",
+                            "status": "open", "opened_at": state["created_at"],
+                        }]
+                        nested = state
+                        for field in fields[:-1]:
+                            nested = nested[field]
+                        nested[fields[-1]] = value
+                        _write_json(project / "PROJECT_STATE.json", state)
+                        errors = validate_project(project)
+                        self.assertTrue(any(error.startswith(expected) for error in errors), errors)
+
+    def test_canonical_roles_cannot_lock_a_different_hashed_file(self):
+        roles = {
+            "character_profile": "CHARACTER_PROFILE.json",
+            "shot_production_table": "04_shot_design/SHOT_PRODUCTION_TABLE.md",
+            "generation_report": "09_reports_and_qc/GENERATION_REPORT.md",
+        }
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            for role, canonical_path in roles.items():
+                with self.subTest(role=role):
+                    state = _prepare_complete_gate_four(project)
+                    artifact = next(a for a in state["locked_artifacts"] if a["role"] == role)
+                    artifact.update({
+                        "path": "PROJECT_BRIEF.md",
+                        "sha256": _sha256(project / "PROJECT_BRIEF.md"),
+                    })
+                    _write_json(project / "PROJECT_STATE.json", state)
+                    self.assertIn(
+                        f"{role} locked artifact path must be {canonical_path}",
+                        validate_project(project),
+                    )
+
+    def test_gate_four_rejects_approval_for_another_version(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state = _prepare_complete_gate_four(project)
+            state["asset_status"]["approval"]["scope"] = ["final_v00.mp4"]
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "Gate 4 complete output is not covered by approval.scope: "
+                "06_generated_assets/final_v01.mp4",
+                validate_project(project),
+            )
+
+    def test_gate_four_approval_must_cover_every_output(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state = _prepare_complete_gate_four(project)
+            second = project / "06_generated_assets/second_v01.mp4"
+            second.write_bytes(b"second-output-fixture")
+            state["asset_status"]["outputs"].append({
+                "path": "06_generated_assets/second_v01.mp4", "version": "v01",
+                "sha256": _sha256(second), "kind": "video",
+            })
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "Gate 4 complete output is not covered by approval.scope: "
+                "06_generated_assets/second_v01.mp4",
+                validate_project(project),
+            )
+            state["asset_status"]["approval"]["scope"].append("second_v01.mp4")
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertEqual(validate_project(project), [])
+
+    def test_gate_four_approval_requires_paths_for_ambiguous_basenames(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state = _prepare_complete_gate_four(project)
+            second = project / "06_generated_assets/alternate/final_v01.mp4"
+            second.parent.mkdir()
+            second.write_bytes(b"alternate-output-fixture")
+            state["asset_status"]["outputs"].append({
+                "path": "06_generated_assets/alternate/final_v01.mp4", "version": "v01",
+                "sha256": _sha256(second), "kind": "video",
+            })
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "Gate 4 complete approval scope must identify exactly one output: final_v01.mp4",
+                validate_project(project),
+            )
+            state["asset_status"]["approval"]["scope"] = [
+                output["path"] for output in state["asset_status"]["outputs"]
+            ]
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertEqual(validate_project(project), [])
+
+    def test_gate_four_approval_rejects_unknown_scope_even_when_outputs_are_covered(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state = _prepare_complete_gate_four(project)
+            state["asset_status"]["approval"]["scope"].append("unlisted.mp4")
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "Gate 4 complete approval scope must identify exactly one output: unlisted.mp4",
+                validate_project(project),
+            )
+
+    def test_gate_four_malformed_scope_and_output_entries_return_diagnostics(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            for value in ([], {}, None, 42):
+                with self.subTest(value=value):
+                    state = _prepare_complete_gate_four(project)
+                    state["asset_status"]["approval"]["scope"] = [value]
+                    state["asset_status"]["outputs"][0]["path"] = value
+                    _write_json(project / "PROJECT_STATE.json", state)
+                    errors = validate_project(project)
+                    self.assertIn("Gate 4 complete requires non-empty asset_status.approval.scope", errors)
+                    self.assertIn("invalid asset_status.outputs[0] path: expected non-empty string", errors)
+
+    def test_consistency_duration_huge_integer_returns_diagnostic(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            state = _prepare_complete_gate_four(project)
+            artifact = next(a for a in state["locked_artifacts"] if a["role"] == "consistency_test")
+            artifact["duration_seconds"] = 10 ** 400
+            _write_json(project / "PROJECT_STATE.json", state)
+            self.assertIn(
+                "consistency_test duration_seconds must be between 4 and 6",
+                validate_project(project),
+            )
+
+    def test_invalid_utf8_state_returns_diagnostic(self):
+        with TemporaryDirectory() as tmp:
+            project = create_project(Path(tmp), "測試片")
+            (project / "PROJECT_STATE.json").write_bytes(b"\xff")
+            errors = validate_project(project)
+            self.assertTrue(any(error.startswith("invalid JSON: PROJECT_STATE.json") for error in errors))
+
     def test_missing_canonical_state_fields_are_reported_in_schema_order(self):
         with TemporaryDirectory() as tmp:
             project = create_project(Path(tmp), "測試片")

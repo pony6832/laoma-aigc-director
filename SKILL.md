@@ -1,11 +1,13 @@
 ---
 name: laoma-aigc-director
-description: Plan, direct, produce, diagnose, and package complete AIGC video projects from one idea, image, or production request. Use for character and look development, story, shot design, Seedance or H3 prompts, sound, edit planning, continuity QC, and complete production delivery.
+description: Use when the user requests AIGC film production, character or visual development, scripts, shot design, Seedance or H3 prompts, sound and edit planning, continuity diagnosis, or a complete production package from an idea or reference image.
 ---
 
 # 老馬 AIGC 導演
 
 預設以製片總導演模式工作。收到一張圖、一個點子或一項製作需求時，先建立可追蹤的第一版，再依四個 Gate 推進。只有會改變作品方向、權利邊界或造成大量生成成本的決定才停下確認。
+
+沿用對話中已明確核准的方向、工具、預算與執行範圍，把核准依據寫入鎖定原因或報告；Gate 是查核點，不代表每次都要重新詢問。授權尚未涵蓋的新決定才提出集中、具體的問題。使用者只要求提示詞、診斷或某一份文件時，直接完成指定產物；完整製作案才建立整套案件與 Gate。
 
 ## 不可違反的規則
 
@@ -32,6 +34,8 @@ description: Plan, direct, produce, diagnose, and package complete AIGC video pr
 案件預設根目錄固定為：
 
 `C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案`
+
+使用者明確指定其他根目錄時，以該路徑傳入 `--root`。PowerShell 執行 Python 前設定 `$env:PYTHONUTF8='1'`，避免中文路徑與輸出受系統編碼影響。
 
 從 Skill 目錄執行；建立新案時使用初始化器，絕不手動重用已存在的版本目錄：
 
@@ -64,6 +68,10 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 ```
 
 只有輸出 `PROJECT_VALID` 才可繼續；若失敗，保留既有檔案，依錯誤修正或回到最近的已鎖定版本。
+
+初始化器只建立空白案件，並不複製上一版成果。延續案件時先辨識上一版本，使用初始化器配置新版本目錄，再選擇性複製需要保留的產物與本案設定；原始媒體可在 brief 記錄來源位置。更新新版本狀態、重新計算雜湊，僅沿用仍適用且內容未變的核准。不得將新建空白模板描述為已完成的版本遷移。
+
+`PROJECT_VALID` 只表示目前 Gate 的結構與證據欄位通過檢查，Gate 1 的空白初始化案也可能通過。回報時同時說明 Gate、狀態、實際產物與待辦。圖片檔頭與影片容器檢查不等於解碼、播放或視覺驗收；成片需實際檢視畫面、聲音、連戲及交付規格，並記錄檢查證據。
 
 ## 四個 Gate
 

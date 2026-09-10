@@ -7,7 +7,7 @@ import hashlib
 import json
 import re
 from datetime import datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import BinaryIO, Iterator
 from xml.etree import ElementTree
 
@@ -76,6 +76,9 @@ _GATE_TWO_IMAGE_ROLES = {
 _CANONICAL_LOCK_PATHS = {
     "project_brief": "PROJECT_BRIEF.md",
     "production_bible": "PRODUCTION_BIBLE.md",
+    "character_profile": "CHARACTER_PROFILE.json",
+    "shot_production_table": "04_shot_design/SHOT_PRODUCTION_TABLE.md",
+    "generation_report": "09_reports_and_qc/GENERATION_REPORT.md",
 }
 _IMAGE_SUFFIXES = {".bmp", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".tif", ".tiff", ".webp"}
 _CONSISTENCY_MEDIA_SUFFIXES = {".mov", ".mp4"}
@@ -84,7 +87,7 @@ _CONSISTENCY_MEDIA_SUFFIXES = {".mov", ".mp4"}
 def _load_json(path: Path, label: str, errors: list[str]) -> dict | None:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         errors.append(f"invalid JSON: {label} ({exc})")
         return None
     if not isinstance(data, dict):
@@ -281,7 +284,10 @@ def _validate_open_decisions(open_decisions: list, errors: list[str]) -> None:
             errors.append(f"invalid {label}.id: expected non-empty string")
         if "question" in decision and not _is_nonempty_string(decision["question"]):
             errors.append(f"invalid {label}.question: expected non-empty string")
-        if "status" in decision and decision["status"] not in {"open", "resolved"}:
+        if "status" in decision and (
+            not isinstance(decision["status"], str)
+            or decision["status"] not in {"open", "resolved"}
+        ):
             errors.append(f"invalid {label}.status: expected 'open' or 'resolved'")
         if "opened_at" in decision and not _is_timezone_aware_iso8601(decision["opened_at"]):
             errors.append(
@@ -303,7 +309,10 @@ def _validate_check_items(checks: object, errors: list[str]) -> None:
                 errors.append(f"missing {label} field: {field}")
         if "name" in check and not _is_nonempty_string(check["name"]):
             errors.append(f"invalid {label}.name: expected non-empty string")
-        if "status" in check and check["status"] not in {"pending", "passed", "failed"}:
+        if "status" in check and (
+            not isinstance(check["status"], str)
+            or check["status"] not in {"pending", "passed", "failed"}
+        ):
             errors.append(f"invalid {label}.status")
         if "evidence" in check and not isinstance(check["evidence"], str):
             errors.append(f"invalid {label}.evidence: expected str")
@@ -330,12 +339,10 @@ def _validate_asset_status_shape(asset_status: dict, errors: list[str]) -> None:
         for field in ("status", "checked_at", "checked_by", "checks"):
             if field not in qc:
                 errors.append(f"missing asset_status.qc field: {field}")
-        if "status" in qc and qc["status"] not in {
-            "not_started",
-            "pending",
-            "passed",
-            "failed",
-        }:
+        if "status" in qc and (
+            not isinstance(qc["status"], str)
+            or qc["status"] not in {"not_started", "pending", "passed", "failed"}
+        ):
             errors.append("invalid asset_status.qc.status")
         if "checked_at" in qc and qc["checked_at"] is not None and not _is_timezone_aware_iso8601(qc["checked_at"]):
             errors.append(
@@ -353,12 +360,10 @@ def _validate_asset_status_shape(asset_status: dict, errors: list[str]) -> None:
         for field in ("status", "approved_at", "approved_by", "scope"):
             if field not in approval:
                 errors.append(f"missing asset_status.approval field: {field}")
-        if "status" in approval and approval["status"] not in {
-            "not_requested",
-            "pending",
-            "approved",
-            "rejected",
-        }:
+        if "status" in approval and (
+            not isinstance(approval["status"], str)
+            or approval["status"] not in {"not_requested", "pending", "approved", "rejected"}
+        ):
             errors.append("invalid asset_status.approval.status")
         if "approved_at" in approval and approval["approved_at"] is not None and not _is_timezone_aware_iso8601(approval["approved_at"]):
             errors.append(
@@ -425,7 +430,7 @@ def _validate_locked_artifacts(
         if target is not None and hash_is_valid and _sha256(target) != expected_hash:
             errors.append(f"{label} sha256 mismatch: {path_value}")
 
-        if role in _GATE_TWO_IMAGE_ROLES and target is not None:
+        if isinstance(role, str) and role in _GATE_TWO_IMAGE_ROLES and target is not None:
             if not _is_inside(target, project_dir / "02_character_and_look"):
                 errors.append(
                     f"{role} path must be inside 02_character_and_look"
@@ -471,6 +476,7 @@ def _validate_locked_artifacts(
                         if (
                             isinstance(duration, (int, float))
                             and not isinstance(duration, bool)
+                            and 4 <= duration <= 6
                             and abs(float(duration) - measured_duration) > 0.05
                         ):
                             errors.append(
@@ -663,6 +669,32 @@ def _validate_gate_four_completion(
             _is_nonempty_string(item) for item in scope
         ):
             errors.append("Gate 4 complete requires non-empty asset_status.approval.scope")
+        elif isinstance(outputs, list):
+            # Schema 1.0 examples use basenames. Keep them valid only when they
+            # identify one output; relative paths disambiguate repeated names.
+            output_paths = [
+                str(PurePosixPath(output["path"].replace("\\", "/")))
+                for output in outputs
+                if isinstance(output, dict) and _is_nonempty_string(output.get("path"))
+            ]
+            covered: set[int] = set()
+            for item in scope:
+                scope_path = str(PurePosixPath(item.replace("\\", "/")))
+                matches = [
+                    index for index, path in enumerate(output_paths)
+                    if scope_path == path
+                    or ("/" not in scope_path and scope_path == PurePosixPath(path).name)
+                ]
+                if len(matches) != 1:
+                    errors.append(
+                        "Gate 4 complete approval scope must identify exactly one output: "
+                        f"{item}"
+                    )
+                else:
+                    covered.add(matches[0])
+            for index, path in enumerate(output_paths):
+                if index not in covered:
+                    errors.append(f"Gate 4 complete output is not covered by approval.scope: {path}")
 
     report_path = project_dir / "09_reports_and_qc" / "GENERATION_REPORT.md"
     template_path = Path(__file__).resolve().parents[1] / "assets" / "generation-report-template.md"

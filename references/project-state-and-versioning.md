@@ -66,6 +66,8 @@
 
 鎖定時先確認檔案存在，再以檔案位元組計算 SHA-256。任何後續修改都使舊雜湊失效；先另存新版、重新核准，再以新物件取代目前鎖定角色，舊檔仍保留。
 
+固定檔案角色必須綁定正確路徑，雜湊正確也不能以其他文件代替：`project_brief` → `PROJECT_BRIEF.md`、`production_bible` → `PRODUCTION_BIBLE.md`、`character_profile` → `CHARACTER_PROFILE.json`、`shot_production_table` → `04_shot_design/SHOT_PRODUCTION_TABLE.md`、`generation_report` → `09_reports_and_qc/GENERATION_REPORT.md`。這些固定路徑的改版須放在新案件版本目錄，避免與鎖定契約衝突。
+
 ## open_decisions
 
 每項未決問題都使用可追蹤物件：
@@ -120,6 +122,7 @@
 - `outputs` 的路徑正規化後必須仍指向 `06_generated_assets/` 內非空檔案並重算匹配 SHA-256；拒絕絕對路徑與 `..` 逃逸。
 - QC `status` 可為 `not_started|pending|passed|failed`；每項 check 為 `pending|passed|failed`。
 - approval `status` 可為 `not_requested|pending|approved|rejected`。
+- 核准 `scope` 應列出本次 `outputs` 的案件相對路徑；為相容既有案件，也接受能唯一識別輸出的檔名。每一項須對應實際輸出，且覆蓋全部輸出；同名輸出請使用完整相對路徑消除歧義。
 - Gate 4 `complete` 只接受 QC 全部通過、核准完成、有非空 scope、無未決項及 `claimed_complete_without_output=false`。
 
 ## Gate 更新順序

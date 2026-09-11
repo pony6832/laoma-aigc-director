@@ -40,10 +40,12 @@
 | 分鏡、逐鏡提示與交付分離 | `ai-video-learning-mentor/references/storyboard-delivery-system.md` | SHA-256 `fd411ff924c0cddf93c631fa33dddd8c4c16cf3618e6fe93bf52b91d1d0545a2` | A：已核准工作方法 | Gate 3；平台中立後再轉入口格式 | 2026-09-02 | 舊分鏡畫面、角色、腳本與固定格數偏好 |
 | 失敗分類與縮減階梯 | `ai-video-learning-mentor/references/failure-recovery.md` | SHA-256 `e9144859c9095eec1c2761d6ef4a485509a16b19295d32699a2154c6b710c763` | A：已核准工作方法 | Gate 2–4；所有入口 | 2026-09-02 | 舊失敗圖、舊提示詞、案例身分與素材 |
 | QC 順序、失敗標籤與暫評邊界 | `ai-video-learning-mentor/references/diagnostics-and-assessment.md` | SHA-256 `d539b40aeef7f70728ee0e49313ed95f74f3f75dd2b232a73d44796abc725cf3` | A：已核准工作方法 | 短測、逐鏡與 Gate 4 | 2026-09-02 | 舊作品評分、個人資料與未觀看輸出的確定評語 |
+| 通用電影鏡頭、九維導演判斷與劇本橋接 | `Krenlis/director-craft-framework` | commit `d6eb6443f643871247228998513071c458de3586`；MIT | C：社群綜合，待一手查證 | Gate 1–4；平台中立 | 2026-09-12 | 2026-06 平台能力、私有素材、未取得原始書籍／教程、空泛器材堆疊 |
 
 ## 來源等級
 
 - A：已核准、平台中立或低漂移的共同工作方法，可直接依本快照執行。
 - B：由帶日期的官方／入口資料提煉出的路由方法。只保留「如何查、如何分層、如何記錄」；易變產品數字與可用性未匯入，執行時重查。
+- C：公開 Skill 或社群研究摘要提煉的方法，可作創作與測試假設；未經獨立一手來源核實的歸因、精確數字與產品能力不得升格為事實。
 
 來源雜湊只證明 2026-09-02 提煉時讀取的檔案版本，不代表來源內容永久正確，也不授權執行外部生成或公開發布。

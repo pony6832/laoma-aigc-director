@@ -16,8 +16,22 @@
 
 每次新增或更新都同步 `catalog.json`、來源 commit、授權、檢查日期與相關路由。週期檢查：失效連結、孤立條目、重複主題、矛盾、缺來源、已被新資料取代或可能過時的產品／技術主張。創作判斷衝突只提出方案，不自行改寫已核准案件事實。
 
+## 是否寫入導演知識庫
+
+Agent 可自行決定是否彙整新增能力、內容與指令；只有同時符合下列條件才寫入個人主表並同步公司副本：
+
+1. 會改變未來案件的判斷、輸出或驗收，而非單次實作細節。
+2. 可跨案件重用，且與既有條目相比有明確新增價值。
+3. 可用穩定知識 ID、觸發情境與調用指令查得。
+4. 來源、版本或 commit、授權、查核日期與證據等級可追溯。
+5. 有可觀察的輸出契約或驗證方式，且不把「有來源」誤寫成「已實測」。
+6. 不含密碼、憑證、客戶私密資料或只屬於單一專案的核准事實。
+
+平台能力、價格、版本與支援上限另須有日期並在執行前重查；重複內容、未證實傳聞、純內部重構與一次性案件資料不寫入通用知識庫。通過者同步更新索引、更新日誌、本地快照與查詢工具；任一副本寫入或回讀失敗時，不宣稱雙份完成。
+
 ## 本次上游快照
 
 - DirectorSKILL 2.1.0，commit `c65ae0d14457053efb1e354c7e7f7e120d97fad1`，MIT；20 份鏡頭模組原樣保存於 `director-styles/lenses/`。
 - Cinecraft，commit `519311207eae74cf91243fda9b03f74dcbeacb0d`，MIT；只改寫採用其來源／綜合／專案分層與 lint 方法，未把其整套 Skill 嵌入執行路由。
-- 授權文字保存於 `director-styles/DIRECTORSKILL_LICENSE.txt` 與 `director-styles/CINECRAFT_LICENSE.txt`。
+- director-craft-framework，commit `d6eb6443f643871247228998513071c458de3586`，MIT；只採用平台中立的劇本到鏡頭、五元組、光線、運鏡、構圖、表演、聲畫與動作物理方法，排除其 2026-06 平台能力資料。
+- 授權文字保存於 `director-styles/DIRECTORSKILL_LICENSE.txt`、`director-styles/CINECRAFT_LICENSE.txt` 與 `references/DIRECTOR_CRAFT_FRAMEWORK_LICENSE.txt`。

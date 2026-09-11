@@ -15,6 +15,7 @@ REFERENCE_FILES = (
     "weekly-evolution.md",
     "director-style-routing.md",
     "director-knowledge-governance.md",
+    "cinematic-craft-foundation.md",
 )
 
 

@@ -6,6 +6,7 @@
 
 - 建立 Project Brief、Production Bible 與角色設定檔。
 - 規劃故事、分鏡、逐鏡生成提示、聲音、剪輯與 QC。
+- 未指定導演時，先以八項通用電影鏡頭方法處理劇本、機位、焦段、運鏡、構圖、燈光、表演、聲畫與動作物理；需要鮮明作者取向時再疊加導演風格模組。
 - 路由 Seedance、MiniMax H3、ComfyUI 等工作方法，執行時重新查證會變動的平台能力。
 - 以 `PROJECT_STATE.json`、版本與 SHA-256 鎖定核准產物。
 - 診斷生成失敗並保留可回退版本。
@@ -36,6 +37,13 @@ python scripts/sync_skill.py --source . --destination-root "$env:USERPROFILE\.co
 安裝後可這樣開始：
 
 > 請用老馬 AIGC 導演模式，把這個想法發展成完整的 AIGC 影片製作案：……
+
+也可查詢可重用的電影鏡頭方法：
+
+```powershell
+$env:PYTHONUTF8='1'
+python scripts/query_cinematic_grammar.py "把角色的抽象焦慮改成可拍攝的表演"
+```
 
 ## 開發驗證
 

@@ -13,6 +13,8 @@ REFERENCE_FILES = (
     "source-manifest.md",
     "prompt-library/README.md",
     "weekly-evolution.md",
+    "director-style-routing.md",
+    "director-knowledge-governance.md",
 )
 
 

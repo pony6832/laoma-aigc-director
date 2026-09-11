@@ -40,6 +40,7 @@ Gate 1–3 不可使用 `complete`；Gate 4 不使用 `approved`，因為實體�
 
 - 輸入：Gate 2 的全部鎖定產物。
 - 最低產物：完整故事／劇本、視覺分鏡、逐鏡表、生成方案、聲音設計、剪輯節奏與 QC 計畫。
+- 若指定導演或作者風格：逐鏡表必須記錄單一風格鏡頭、五軸可觀察設計、反例與 A／B 短測驗收點；風格模組不得覆蓋 Gate 2 鎖定。
 - 通過條件：每個鏡頭都有敘事用途、走位、構圖焦點、運鏡、節奏、連續性、可執行輸入、聲音與驗收點；至少把 `story_script`、`shot_production_table`、`generation_plan` 三個角色以 SHA-256 鎖定。
 - 停止條件：敘事、鏡頭、生成入口或成本尚未核准。
 
@@ -57,6 +58,7 @@ Gate 3 通過前不得進入批次或高成本生成。只修失敗鏡頭時，�
   - `claimed_complete_without_output=false`，且沒有未決 `open_decisions`。
 - 通過條件：輸出檔、雜湊、報告、QC 與核准全部通過 `scripts/validate_project.py`。
 - 停止條件：缺少實體輸出、雜湊不符、任何 QC 未通過、輸出規格不符、權利阻擋或核准被撤回。
+- 若 Gate 3 鎖定了導演風格：另以 `assets/director-style-review-template.md` 記錄 timecode 證據與判定；`STYLE_LOCK_PASS` 只代表風格軸通過，不能取代其餘 Gate 4 QC。
 
 工具不可操作時可以交付完整可執行生成／剪輯包，但案件停在 Gate 3 或 Gate 4 `blocked`，不可標為 `complete`。
 

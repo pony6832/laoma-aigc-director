@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "repository": "https://github.com/wuwangzhang1216/DirectorSKILL",
+    "commit": "c65ae0d14457053efb1e354c7e7f7e120d97fad1",
+    "version": "2.1.0",
+    "license": "MIT",
+    "reviewed_at": "2026-09-12"
+  },
+  "styles": [
+    {"slug":"spielberg","name":"Steven Spielberg","aliases":["史蒂芬史匹柏","斯皮尔伯格"],"path":"lenses/01_spielberg.md","evidence_status":"community_synthesis"},
+    {"slug":"hitchcock","name":"Alfred Hitchcock","aliases":["希區考克","希区柯克"],"path":"lenses/02_hitchcock.md","evidence_status":"community_synthesis"},
+    {"slug":"kubrick","name":"Stanley Kubrick","aliases":["庫柏力克","库布里克"],"path":"lenses/03_kubrick.md","evidence_status":"community_synthesis"},
+    {"slug":"kurosawa","name":"Akira Kurosawa","aliases":["黑澤明","黑泽明"],"path":"lenses/04_kurosawa.md","evidence_status":"community_synthesis"},
+    {"slug":"scorsese","name":"Martin Scorsese","aliases":["馬丁史柯西斯","斯科塞斯"],"path":"lenses/05_scorsese.md","evidence_status":"community_synthesis"},
+    {"slug":"fellini","name":"Federico Fellini","aliases":["費里尼","费里尼"],"path":"lenses/06_fellini.md","evidence_status":"community_synthesis"},
+    {"slug":"bergman","name":"Ingmar Bergman","aliases":["柏格曼","伯格曼"],"path":"lenses/07_bergman.md","evidence_status":"community_synthesis"},
+    {"slug":"tarkovsky","name":"Andrei Tarkovsky","aliases":["塔可夫斯基","塔科夫斯基"],"path":"lenses/08_tarkovsky.md","evidence_status":"community_synthesis"},
+    {"slug":"wong-kar-wai","name":"Wong Kar-wai","aliases":["王家衛","王家卫"],"path":"lenses/09_wong_kar_wai.md","evidence_status":"community_synthesis"},
+    {"slug":"nolan","name":"Christopher Nolan","aliases":["諾蘭","诺兰"],"path":"lenses/10_nolan.md","evidence_status":"community_synthesis"},
+    {"slug":"villeneuve","name":"Denis Villeneuve","aliases":["維勒納夫","维伦纽瓦"],"path":"lenses/11_villeneuve.md","evidence_status":"community_synthesis"},
+    {"slug":"fincher","name":"David Fincher","aliases":["大衛芬奇","大卫芬奇"],"path":"lenses/12_fincher.md","evidence_status":"community_synthesis"},
+    {"slug":"refn","name":"Nicolas Winding Refn","aliases":["雷芬"],"path":"lenses/13_refn.md","evidence_status":"community_synthesis"},
+    {"slug":"bi-gan","name":"Bi Gan","aliases":["畢贛","毕赣"],"path":"lenses/14_bi_gan.md","evidence_status":"community_synthesis"},
+    {"slug":"zhang-yimou","name":"Zhang Yimou","aliases":["張藝謀","张艺谋"],"path":"lenses/15_zhang_yimou.md","evidence_status":"community_synthesis"},
+    {"slug":"hou-hsiao-hsien","name":"Hou Hsiao-hsien","aliases":["侯孝賢","侯孝贤"],"path":"lenses/16_hou_hsiao_hsien.md","evidence_status":"community_synthesis"},
+    {"slug":"park-chan-wook","name":"Park Chan-wook","aliases":["朴贊郁","朴赞郁"],"path":"lenses/17_park_chan_wook.md","evidence_status":"community_synthesis"},
+    {"slug":"malick","name":"Terrence Malick","aliases":["泰倫斯馬利克","泰伦斯马利克"],"path":"lenses/18_malick.md","evidence_status":"community_synthesis"},
+    {"slug":"michael-mann","name":"Michael Mann","aliases":["麥可曼恩","迈克尔曼"],"path":"lenses/19_michael_mann.md","evidence_status":"community_synthesis"},
+    {"slug":"coen-brothers","name":"Coen Brothers","aliases":["柯恩兄弟","科恩兄弟"],"path":"lenses/20_coen_brothers.md","evidence_status":"community_synthesis"}
+  ]
+}

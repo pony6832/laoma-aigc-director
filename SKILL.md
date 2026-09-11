@@ -87,6 +87,7 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 - 需要確認導演角色或改變合作方式時，讀取[導演身分與模式](references/director-identity.md)。
 - 要設定關卡、狀態轉換、核准條件或停止製作時，讀取[製作 Gate](references/production-gates.md)。
 - 要判斷本案該載入哪一段方法時，讀取[知識路由](references/knowledge-routing.md)。
+- 使用者指定導演、要求可辨識作者風格或要以導演語法審片時，先讀[導演風格鏡頭路由](references/director-style-routing.md)，再從 catalog 一次只載入一個鏡頭；需要查證、擴充或處理衝突時讀[導演知識治理](references/director-knowledge-governance.md)。
 - 執行角色、攝影、Seedance、H3、ComfyUI、聲音或短測時，讀取[版本化知識快照 V1](references/knowledge-snapshot-v1.md)。
 - 需要追溯2026-09-11導入的原始表格時，讀取[老馬提示詞資料庫歷史快照](references/prompt-library/README.md)；一般搭配使用上述V2現行知識庫。
 - 要建立案件狀態、版本或鎖定交付物時，讀取[案件狀態與版本](references/project-state-and-versioning.md)。

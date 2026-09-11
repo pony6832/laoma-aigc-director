@@ -82,11 +82,13 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 
 ## 按需知識路由
 
+- 日常提示詞搭配、新AIGC方法或每週自主學習，優先讀取[每週進化與現行知識庫](references/weekly-evolution.md)，使用V2現行快照；舊提示詞資料庫只供歷史追溯。
+
 - 需要確認導演角色或改變合作方式時，讀取[導演身分與模式](references/director-identity.md)。
 - 要設定關卡、狀態轉換、核准條件或停止製作時，讀取[製作 Gate](references/production-gates.md)。
 - 要判斷本案該載入哪一段方法時，讀取[知識路由](references/knowledge-routing.md)。
 - 執行角色、攝影、Seedance、H3、ComfyUI、聲音或短測時，讀取[版本化知識快照 V1](references/knowledge-snapshot-v1.md)。
-- 使用者要求搭配快捷指令、圖像提示、照片修復、完整圖像案例、運鏡、影片燈光或角色設計長模板時，先讀取[老馬提示詞資料庫快照](references/prompt-library/README.md)，再查詢最相關的少量紀錄並依本案鎖定內容組裝。
+- 需要追溯2026-09-11導入的原始表格時，讀取[老馬提示詞資料庫歷史快照](references/prompt-library/README.md)；一般搭配使用上述V2現行知識庫。
 - 要建立案件狀態、版本或鎖定交付物時，讀取[案件狀態與版本](references/project-state-and-versioning.md)。
 - 發生品質問題或需要縮減重試時，讀取[品質與復原](references/quality-and-recovery.md)。
 - 要確認快照來源、分級、雜湊、排除內容或需否重查時，讀取[來源清單](references/source-manifest.md)。

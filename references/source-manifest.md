@@ -1,5 +1,12 @@
 # 來源清單
 
+## 現行V2與每週更新
+
+2026-09-11起現行個人主表為 `1E9MrvDlFdCEpLQ8RbARLi8gSomQaYWb25Kxik_xIIdc`；公司同步副本為 `1OpLwd3p3UrJCHrhYGdjBYq2WwVynsKn_OAtzClq-7bU`，每週以個人主表為準同步。
+新舊表同置資料夾 `1F0RPxifumzVJncvweJEzOZtWjbmTCqAY`。
+現行快照由 `references/evolving-library/active.json` 指定，包含每檔SHA-256與來源分頁範圍；初版724項包含712筆舊資料與12筆補充。
+細節見[每週進化](weekly-evolution.md)。以下V1來源記錄保留供追溯，不是最新能力資料。
+
 - 快照名稱：`director-methods-v1.0.0`
 - 同步日期：2026-09-02
 - 來源範圍：已安裝 `ai-video-learning-mentor` 於同步當下的可移植方法，以及本案已核准設計。

@@ -12,6 +12,7 @@ REFERENCE_FILES = (
     "knowledge-snapshot-v1.md",
     "source-manifest.md",
     "prompt-library/README.md",
+    "weekly-evolution.md",
 )
 
 

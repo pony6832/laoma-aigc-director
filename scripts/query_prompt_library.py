@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -32,7 +33,13 @@ def _record_from_row(
 
 
 def _iter_records(library: Path, sheet: dict[str, Any]):
-    payload = json.loads((library / sheet["file"]).read_text(encoding="utf-8"))
+    path = (library / sheet["file"]).resolve()
+    if library.resolve() not in path.parents:
+        raise ValueError("snapshot file outside library")
+    raw = path.read_bytes()
+    if sheet.get("sha256") and hashlib.sha256(raw).hexdigest() != sheet["sha256"]:
+        raise ValueError(f"hash mismatch: {path.name}")
+    payload = json.loads(raw.decode("utf-8"))
     rows = payload.get("rows", [])
     header_row = payload.get("header_row")
     if header_row is None:
@@ -47,7 +54,7 @@ def _iter_records(library: Path, sheet: dict[str, Any]):
     headers = rows[header_index]
     for row_index, row in enumerate(rows[header_index + 1 :], start=header_row + 1):
         record = _record_from_row(headers, row, sheet.get("header_overrides", {}))
-        if record:
+        if record and record.get("生命週期") != "停用":
             yield row_index, record
 
 
@@ -59,6 +66,13 @@ def query_library(
     if limit < 1:
         raise ValueError("limit must be at least 1")
 
+    library = Path(library).resolve()
+    active = library / "active.json"
+    if active.is_file():
+        target = (library / json.loads(active.read_text(encoding="utf-8"))["snapshot"]).resolve()
+        if library not in target.parents:
+            raise ValueError("active snapshot outside library")
+        library = target
     manifest = _load_manifest(library)
     sheets = manifest.get("sheets", [])
     known_names = {sheet["name"] for sheet in sheets}

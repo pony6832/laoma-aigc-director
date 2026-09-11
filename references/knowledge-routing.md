@@ -1,5 +1,7 @@
 # 知識路由
 
+現行提示詞與週更方法優先讀[每週進化](weekly-evolution.md)，查詢references/evolving-library。下文prompt-library為V1歷史來源；「要求更新才重讀」不限制已授權的每週自動更新。
+
 本 Skill 已把 V1 所需方法固定在本套件的[版本化知識快照 V1](knowledge-snapshot-v1.md)，執行時不依賴 `ai-video-learning-mentor` 資料夾。只載入當前案件需要的快照片段，避免無關方法污染決策。
 
 | 觸發條件 | 讀取快照段落 | 必須帶入本案的已鎖定輸入 | 輸出 |

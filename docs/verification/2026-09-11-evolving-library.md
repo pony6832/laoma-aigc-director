@@ -8,3 +8,11 @@
 - active.json points to 2026-09-11-personal-v2, sourced from personal primary. Older snapshots preserved.
 - Existing automation aigc updated and TOML read back: ACTIVE, Sundays 10:00 Asia/Taipei. Primary then mirror synchronization, conflict preservation, skill snapshot publication and NAS weekly report. Schedule execution itself has not yet occurred.
 - New generated-media experiments remain plans, not completed generation evidence.
+
+## Core platform expansion
+
+- Added six official source records covering Seedance 2.0, Seedance 2.5, Kling 3.0, MiniMax H3, ComfyUI, and Higgsfield; added ten queryable methods, two capability rows, and five learning stages.
+- Personal primary and company mirror changed ranges were read back and matched. Native table ranges now cover all added rows; visual checks passed for the six edited sheets.
+- Active snapshot: `2026-09-11-core5-r2`, 734 knowledge records. Ninety-one unit tests and skill validation pass; installed query checks MiniMax H3 routing successfully.
+- Intermediate immutable snapshots `2026-09-11-core5` and `2026-09-11-core5-r1` are retained for audit history; neither is active.
+- All new platform methods remain `未實測`; official documentation is not generation evidence.

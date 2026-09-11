@@ -111,6 +111,12 @@ def query_library(
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Machine-readable output must not depend on the active Windows code page.
+    # The tests and downstream callers consume JSON as UTF-8 bytes.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--library", type=Path, required=True)
     parser.add_argument("--query", required=True)

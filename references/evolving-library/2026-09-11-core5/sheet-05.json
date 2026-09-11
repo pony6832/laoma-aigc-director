@@ -1,0 +1,151 @@
+{
+  "name": "05_來源登錄",
+  "sheet_id": 9005,
+  "source_range": "'05_來源登錄'!A1:I13",
+  "rows": [
+    [
+      "來源ID",
+      "來源名稱",
+      "URL",
+      "來源類型",
+      "發布或更新日期",
+      "查核日期",
+      "證據範圍",
+      "限制",
+      "複查頻率"
+    ],
+    [
+      "SRC-LEGACY",
+      "使用者原表",
+      "https://docs.google.com/spreadsheets/d/16lXfAvewRtOvu0UpQjbNsmGE6w3nB3T5DGYZ1n4BzAY/edit",
+      "使用者資料",
+      "未提供",
+      "2026-09-11",
+      "712筆原始內容與說明",
+      "不是逐筆官方驗證；保留原表列號",
+      "每月"
+    ],
+    [
+      "SRC-RUNWAY",
+      "Runway I2V Prompting Guide",
+      "https://help.runwayml.com/hc/en-us/articles/48324313115155-Image-to-Video-Prompting-Guide",
+      "官方文件",
+      "頁面未明示",
+      "2026-09-11",
+      "動作分層、首幀暗示、意外切鏡",
+      "對Gen-4.5的文件建議，非所有模型通用",
+      "每週"
+    ],
+    [
+      "SRC-VEO",
+      "Gemini API Veo guide",
+      "https://ai.google.dev/gemini-api/docs/veo",
+      "官方文件",
+      "以當前頁面為準",
+      "2026-09-11",
+      "音訊提示與參考素材模式",
+      "版本、入口與帳號額度需另核對",
+      "每週"
+    ],
+    [
+      "SRC-OMNI",
+      "Gemini Omni Flash guide",
+      "https://ai.google.dev/gemini-api/docs/omni",
+      "官方文件",
+      "2026-09-08",
+      "2026-09-11",
+      "來源影片、首尾幀、參考素材的不同角色",
+      "未執行生成；帳號可用性未確認",
+      "每週"
+    ],
+    [
+      "SRC-ELEVEN",
+      "ElevenLabs Text to Dialogue",
+      "https://elevenlabs.io/docs/overview/capabilities/text-to-dialogue",
+      "官方文件",
+      "頁面未明示",
+      "2026-09-11",
+      "Eleven v3各回合聲音與情緒標籤",
+      "未聆聽本案輸出",
+      "每週"
+    ],
+    [
+      "SRC-METHOD",
+      "老馬導演工作方法",
+      "https://github.com/pony6832/laoma-aigc-director",
+      "工作方法",
+      "2026-09-11",
+      "2026-09-11",
+      "A/B測試、版本、剪輯與QC方案",
+      "本次編寫，需在實際作品中驗證",
+      "每月"
+    ],
+    [
+      "SRC-SEED20",
+      "ByteDance Seedance 2.0 Official Launch",
+      "https://seed.bytedance.com/en/blog/seedance-2-0-official-launch",
+      "官方發布",
+      "2026-02-12",
+      "2026-09-11",
+      "多模態輸入、參考／編修／延伸、15秒聲畫能力",
+      "官方能力說明；帳號入口與實測品質另核",
+      "每週"
+    ],
+    [
+      "SRC-SEED25",
+      "ByteDance Seedance 2.5",
+      "https://seed.bytedance.com/en/seedance2_5",
+      "官方模型頁",
+      "2026-07-31",
+      "2026-09-11",
+      "30秒敘事、多輪延伸、參考控制與編修",
+      "實際入口、成本與延伸次數依當前介面核對",
+      "每週"
+    ],
+    [
+      "SRC-KLING30",
+      "Kuaishou Kling AI 3.0 launch",
+      "https://ir.kuaishou.com/news-releases/news-release-details/kling-ai-launches-30-model-ushering-era-where-everyone-can-be",
+      "官方發布",
+      "2026-02-05",
+      "2026-09-11",
+      "Video 3.0／Omni、全模態、15秒、多鏡與原生音訊",
+      "具體API參數、4K與Turbo入口另查",
+      "每週"
+    ],
+    [
+      "SRC-H3",
+      "MiniMax H3 Open Source",
+      "https://www.minimax.io/news/minimax-h3-open-source",
+      "官方發布／開源文件",
+      "2026-08-03",
+      "2026-09-11",
+      "H3架構、FL2VA／Ref2VA、地端與完整2K混合流程",
+      "社群授權、硬體、API與本機可行性另核",
+      "每週"
+    ],
+    [
+      "SRC-COMFY",
+      "ComfyUI Official Documentation",
+      "https://docs.comfy.org/index",
+      "官方文件",
+      "持續更新",
+      "2026-09-11",
+      "節點式引擎、安裝、工作流、Local／Cloud API與custom nodes",
+      "實際版本、節點和模型支援必須按安裝核對",
+      "每週"
+    ],
+    [
+      "SRC-HIGGS",
+      "Higgsfield Cinema Studio and official platform",
+      "https://higgsfield.ai/blog/how-we-built-cinema-studio",
+      "官方平台文件",
+      "2026-08-12",
+      "2026-09-11",
+      "攝影機、鏡頭、焦段、光圈、Elements、Soul ID與跨模型工作區",
+      "官方自述；方案、入口與輸出品質需實測",
+      "每週"
+    ]
+  ],
+  "header_row": 1
+}

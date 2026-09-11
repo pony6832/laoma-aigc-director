@@ -1,0 +1,63 @@
+{
+  "schema_version": "2.0",
+  "spreadsheet_id": "1E9MrvDlFdCEpLQ8RbARLi8gSomQaYWb25Kxik_xIIdc",
+  "captured_at": "2026-09-11",
+  "version": "2026-09-11-core5-r2",
+  "sheets": [
+    {
+      "name": "00_使用導覽",
+      "file": "sheet-00.json",
+      "sha256": "20f313a430a5b17e505fb8fc84805e4d82f26aeac571a8aa5d7bc6d45a155402"
+    },
+    {
+      "name": "01_分類與任務",
+      "file": "sheet-01.json",
+      "sha256": "da8d9359e0e85c7205a6ebbf8faea68a75776afbe67bf53d8496293aa6c8f857"
+    },
+    {
+      "name": "02_提示詞總庫",
+      "file": "sheet-02.json",
+      "sha256": "0245ec5e6e8e7da99e80e230feac3d9172a3c30c9d65624df4f5e84fe8ab4511"
+    },
+    {
+      "name": "03_組合工作流",
+      "file": "sheet-03.json",
+      "sha256": "0f5bd1668f87a36ceab807cfaf47ee8087ae08508d56234030aead8bd3b784e3"
+    },
+    {
+      "name": "04_模型能力",
+      "file": "sheet-04.json",
+      "sha256": "fa84244654c9e8714a0f5fcc7f9ad96cb60804400a8236e399a905d8fcb0e34f"
+    },
+    {
+      "name": "05_來源登錄",
+      "file": "sheet-05.json",
+      "sha256": "2b0d1f5ac2b78b1e2f9d6e184c6b9a7cf281277a15da62da0c19b5f88b5d2090"
+    },
+    {
+      "name": "06_實測與失敗",
+      "file": "sheet-06.json",
+      "sha256": "e8a52c0286ee160af61e9e3d92d45b93ead1ae1e1c8504ad9066f89266dc356b"
+    },
+    {
+      "name": "07_缺口與待辦",
+      "file": "sheet-07.json",
+      "sha256": "b47d3c444b156d01976a976192e131b6a9011e579820ccd33c0bef60c832f287"
+    },
+    {
+      "name": "08_更新日誌",
+      "file": "sheet-08.json",
+      "sha256": "8387ee14a8f2de66ba3ad23be7cb167db2d5492af1466c915dbc070edac07aed"
+    },
+    {
+      "name": "09_更新規則",
+      "file": "sheet-09.json",
+      "sha256": "313ef1d9f173587bca43e877b210a64d81bd2acc47cfb42636c9b25abd0b599c"
+    },
+    {
+      "name": "10_學習路線",
+      "file": "sheet-10.json",
+      "sha256": "8a4a463ee9be328bafbfd1c16194c6c741663b6d1fe9ddcac3c95f0970745700"
+    }
+  ]
+}

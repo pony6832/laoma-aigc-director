@@ -52,13 +52,13 @@ def publish(payload, library, version):
         filename = f"sheet-{i:02d}.json"
         content = dict(sheet, header_row=1)
         path = target / filename
-        path.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        path.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
         manifest["sheets"].append({"name":sheet["name"], "file":filename,
              "sha256":hashlib.sha256(path.read_bytes()).hexdigest()})
-    (target / "manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (target / "manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8",newline="\n")
     active = library / "active.json"
     pending = library / "active.pending.json"
-    pending.write_text(json.dumps({"snapshot":version},ensure_ascii=False)+"\n",encoding="utf-8")
+    pending.write_text(json.dumps({"snapshot":version},ensure_ascii=False)+"\n",encoding="utf-8",newline="\n")
     pending.replace(active)
     return target
 

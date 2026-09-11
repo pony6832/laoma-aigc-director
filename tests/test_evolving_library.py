@@ -46,3 +46,8 @@ class EvolvingLibraryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"hash mismatch"):
                 query_library(Path(d),"自然窗光")
 
+    def test_publisher_uses_lf_line_endings(self):
+        with tempfile.TemporaryDirectory() as d:
+            target = publish(self.fixture(), d, "2026-09-11-test")
+            self.assertNotIn(b"\r\n", (Path(d) / "active.json").read_bytes())
+            self.assertNotIn(b"\r\n", (target / "manifest.json").read_bytes())

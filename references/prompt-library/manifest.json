@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "library_name": "laoma-prompt-library",
+  "spreadsheet_id": "16lXfAvewRtOvu0UpQjbNsmGE6w3nB3T5DGYZ1n4BzAY",
+  "source_url": "https://docs.google.com/spreadsheets/d/16lXfAvewRtOvu0UpQjbNsmGE6w3nB3T5DGYZ1n4BzAY/edit",
+  "captured_at": "2026-09-11",
+  "snapshot_policy": "Local immutable snapshot; refresh from the source only when the user asks for current data.",
+  "sheets": [
+    {"name": "分類索引", "sheet_id": 1789012, "file": "category-index.json", "header_row": 4, "nonempty_rows": 13},
+    {"name": "快捷指令清單", "sheet_id": 0, "file": "command-list.json", "header_row": 1, "nonempty_rows": 100},
+    {"name": "圖像生成快捷詞（自訂）", "sheet_id": 1789013, "file": "image-shortcuts.json", "header_row": 1, "nonempty_rows": 101},
+    {"name": "照片修復與影像優化提示詞", "sheet_id": 1789014, "file": "photo-restoration.json", "header_row": 1, "nonempty_rows": 121},
+    {"name": "完整圖像提示詞案例（長版）", "sheet_id": 1789015, "file": "image-long-prompts.json", "header_row": 1, "nonempty_rows": 121},
+    {"name": "動態拍攝運鏡提示詞", "sheet_id": 1789016, "file": "camera-movements.json", "header_row": 1, "nonempty_rows": 121},
+    {"name": "影片燈光與環境光源提示詞", "sheet_id": 1789017, "file": "video-lighting.json", "header_row": 1, "header_overrides": {"14": "內容"}, "nonempty_rows": 153},
+    {"name": "雜項紀錄", "sheet_id": 217088058, "file": "misc-notes.json", "header_row": null, "nonempty_rows": 1}
+  ]
+}

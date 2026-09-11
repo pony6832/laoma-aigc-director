@@ -11,6 +11,7 @@ REFERENCE_FILES = (
     "quality-and-recovery.md",
     "knowledge-snapshot-v1.md",
     "source-manifest.md",
+    "prompt-library/README.md",
 )
 
 
@@ -18,7 +19,10 @@ class ReferenceContractTests(unittest.TestCase):
     def test_all_routed_references_exist(self):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         links = re.findall(r"\]\((references/[^)]+\.md)\)", skill)
-        self.assertEqual({Path(link).name for link in links}, set(REFERENCE_FILES))
+        self.assertEqual(
+            {link.removeprefix("references/") for link in links},
+            set(REFERENCE_FILES),
+        )
         for link in links:
             self.assertTrue((ROOT / link).is_file(), link)
 

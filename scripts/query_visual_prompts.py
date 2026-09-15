@@ -38,7 +38,13 @@ def search(query: str, catalog: dict | None = None, limit: int = 8) -> list[dict
     scored = []
     for item in catalog["items"]:
         primary = " ".join(
-            [item["canonical_key"], item["shortcut"], item["name_zh"], item["category"]]
+            [
+                item["canonical_key"],
+                item["shortcut"],
+                item["name_zh"],
+                item["category"],
+                *item.get("aliases", []),
+            ]
         ).casefold()
         secondary = " ".join(
             [item["function"], item["prompt_fragment"], item["risk_qc"], *item["source_sections"]]

@@ -89,7 +89,7 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 - 要設定關卡、狀態轉換、核准條件或停止製作時，讀取[製作 Gate](references/production-gates.md)。
 - 要判斷本案該載入哪一段方法時，讀取[知識路由](references/knowledge-routing.md)。
 - 劇本轉鏡頭、分鏡、構圖、運鏡、打光、表演、聲畫或動作設計時，先讀[通用電影鏡頭基礎](references/cinematic-craft-foundation.md)；即使沒有指定導演也要使用，再視需要疊加一份導演風格鏡頭。
-- 要把參考圖的角度、天氣、燈光、鏡頭效果、場景、類型、美學、渲染或創意特效轉成可組合提示詞時，查詢[視覺提示詞分類](references/visual-prompt-catalog.json)或執行 `scripts/query_visual_prompts.py`；其中斜線詞是平台中立的意圖標記，不是官方命令。
+- 要把參考圖的角度、構圖、電影外觀、燈光、商品廣告、動作、超現實、攝影編輯、幕後製作、場景、類型、渲染或創意特效轉成可組合提示詞時，查詢[視覺提示詞分類](references/visual-prompt-catalog.json)或執行 `scripts/query_visual_prompts.py`；其中斜線詞是平台中立的意圖標記，不是官方命令。Speed Ramp、Jump Cut 等時間語法不可用單張圖宣稱完成，必須以影片序列驗收；品牌或格式名稱只作來源別名，不代表授權或官方模式。
 - 使用者指定導演、要求可辨識作者風格或要以導演語法審片時，先讀[導演風格鏡頭路由](references/director-style-routing.md)，再從 catalog 一次只載入一個鏡頭；需要查證、擴充或處理衝突時讀[導演知識治理](references/director-knowledge-governance.md)。
 - 執行角色、攝影、Seedance、H3、ComfyUI、聲音或短測時，讀取[版本化知識快照 V1](references/knowledge-snapshot-v1.md)。
 - 需要追溯2026-09-11導入的原始表格時，讀取[老馬提示詞資料庫歷史快照](references/prompt-library/README.md)；一般搭配使用上述V2現行知識庫。

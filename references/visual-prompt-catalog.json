@@ -8,7 +8,11 @@
     "1789450877768.jpg", "1789450913316.jpg", "1789450923390.jpg",
     "1789450950766.jpg", "1789450937733.jpg", "1789450986201.jpg",
     "1789450997532.jpg", "1789450967403.jpg", "1789451010280.jpg",
-    "1789451025483.jpg"
+    "1789451025483.jpg",
+    "1789462463257.jpg", "1789462481607.jpg", "1789462491822.jpg",
+    "1789462503973.jpg", "1789462515689.jpg", "1789462528218.jpg",
+    "1789462538607.jpg", "1789462549905.jpg", "1789462584773.jpg",
+    "1789462596353.jpg"
   ],
   "source_audit": {
     "advertised_sequence": "1–99",
@@ -24,6 +28,30 @@
     ],
     "boundary": "這些是社群型提示詞與視覺意圖，不是特定生成平台的官方斜線指令，也不證明模型支援或輸出品質。"
   },
+  "source_audits": [
+    {
+      "batch_id": "2026-09-15-set1",
+      "advertised_sequence": "1–99",
+      "observed_tiles": 102,
+      "new_unique_concepts": 96,
+      "merged_duplicates": 6
+    },
+    {
+      "batch_id": "2026-09-15-set2",
+      "advertised_sequence": "1–100",
+      "observed_tiles": 100,
+      "new_unique_concepts": 77,
+      "merged_with_existing": 21,
+      "merged_within_batch": 2,
+      "merged_terms": [
+        "Low Angle", "High Angle", "OTS", "POV", "Worms View", "Birds View", "Drone View",
+        "Close Up", "Extreme Close Up", "Cinematic", "Noir", "Golden Hour", "Blue Hour",
+        "Soft Light", "Rim Light", "Backlight", "Silhouette", "Fisheye", "Reflection",
+        "Underwater", "Concept Art", "BTS / Behind the Scenes / Making Of"
+      ],
+      "boundary": "來源圖卡的斜線詞是平台中立意圖標記；Apple Style、IMAX等名稱只保留為來源別名，不代表品牌授權或官方模型模式。Speed Ramp與Jump Cut屬時間／剪輯語法，單張圖只能表現動勢，真正效果須用影片序列驗收。"
+    }
+  ],
   "category_defaults": {
     "品質與寫實": "需以實際輸出尺寸、細節、噪點、邊緣與材質檢查；文字不保證真實輸出解析度或寫實度。",
     "鏡位與視角": "檢查主體比例、透視、空間方向與地平線，避免畸變或視角矛盾。",
@@ -34,7 +62,14 @@
     "環境場景": "檢查地貌、天候、時間、材質與角色互動的一致性。",
     "類型與世界觀": "檢查世界規則、服化道、建築、科技或年代線索是否一致。",
     "藝術與渲染": "檢查媒材特徵、筆觸、材質、光影與細節層級，不宣稱特定藝術家模仿。",
-    "創意特效": "檢查合成邏輯、遮罩、反射、邊緣、物理反應與主體辨識度。"
+    "創意特效": "檢查合成邏輯、遮罩、反射、邊緣、物理反應與主體辨識度。",
+    "構圖與取景": "檢查主體尺寸、視線、畫面平衡、前中後景與裁切；構圖規則要服務敘事而非機械套用。",
+    "電影外觀": "檢查畫幅、鏡頭特性、年代材質、色調與敘事是否一致；品牌或格式名稱只作視覺意圖，不宣稱官方規格。",
+    "商品與廣告": "檢查商品幾何、標示、材質、接觸陰影與品牌權利；不得臆造Logo、功能、包裝文字或競品風格授權。",
+    "動作與動態": "檢查姿勢重心、運動方向、接觸反作用、模糊一致與前後幀連續；時間型效果必須以影片序列驗收。",
+    "超現實與不可能": "檢查世界規則、尺度、重力、透視、遮擋與光影是否自洽，讓不可能元素仍可相信。",
+    "攝影與編輯": "檢查媒材、焦段、顆粒、閃光、版式與人物權利；紀實外觀不得被誤稱為真實事件證據。",
+    "幕後與製作": "檢查器材、燈位、工作人員與監看關係是否合理；不得洩露未授權素材、場地、螢幕內容或人員身份。"
   },
   "items": [
     {"id":"VP-001","canonical_key":"4k","shortcut":"/4K","name_zh":"4K 細節意圖","category":"品質與寫實","source_numbers":[1],"function":"要求較清楚的材質與邊緣描述。","prompt_fragment":"high-quality image, fine texture detail, clean edges, 4K detail intent"},
@@ -54,9 +89,9 @@
     {"id":"VP-014","canonical_key":"wide-angle","shortcut":"/WIDEANGLE","name_zh":"廣角視野","category":"鏡位與視角","source_numbers":[14,41],"source_sections":["鏡位與視角","攝影與鏡頭效果"],"function":"擴張空間與前後景關係，適合環境敘事。","prompt_fragment":"wide-angle perspective, expansive field of view, strong foreground-to-background depth"},
     {"id":"VP-015","canonical_key":"fisheye","shortcut":"/FISHEYE","name_zh":"魚眼視角","category":"鏡位與視角","source_numbers":[15,44],"source_sections":["鏡位與視角","攝影與鏡頭效果"],"function":"用強烈桶形畸變製造超廣角與超現實感。","prompt_fragment":"fisheye lens perspective, pronounced barrel distortion, ultra-wide surreal view"},
     {"id":"VP-016","canonical_key":"pov","shortcut":"/POV","name_zh":"第一人稱主觀鏡頭","category":"鏡位與視角","source_numbers":[16],"function":"讓畫面等同角色眼睛所見。","prompt_fragment":"first-person point-of-view shot, camera at the character's eye position, embodied perspective"},
-    {"id":"VP-017","canonical_key":"over-the-shoulder","shortcut":"/OVERTHESHOULDER","name_zh":"越肩鏡頭","category":"鏡位與視角","source_numbers":[17],"function":"從肩後建立人物與觀看對象的關係。","prompt_fragment":"over-the-shoulder composition, foreground shoulder silhouette, clear eyeline to the subject"},
-    {"id":"VP-018","canonical_key":"bird-eye-view","shortcut":"/BIRDEYEVIEW","name_zh":"鳥瞰視角","category":"鏡位與視角","source_numbers":[18],"function":"以極高視點看清場景配置與群體關係。","prompt_fragment":"bird's-eye view directly over the scene, readable layout, small-scale subjects"},
-    {"id":"VP-019","canonical_key":"worms-eye-view","shortcut":"/WORMSEYEVIEW","name_zh":"蟲視仰角","category":"鏡位與視角","source_numbers":[19],"function":"貼近地面向上觀看，誇大高度與壓迫。","prompt_fragment":"worm's-eye view near ground level, extreme upward perspective, towering scale"},
+    {"id":"VP-017","canonical_key":"over-the-shoulder","shortcut":"/OVERTHESHOULDER","aliases":["/OTS"],"name_zh":"越肩鏡頭","category":"鏡位與視角","source_numbers":[17],"function":"從肩後建立人物與觀看對象的關係。","prompt_fragment":"over-the-shoulder composition, foreground shoulder silhouette, clear eyeline to the subject"},
+    {"id":"VP-018","canonical_key":"bird-eye-view","shortcut":"/BIRDEYEVIEW","aliases":["/BIRDSVIEW"],"name_zh":"鳥瞰視角","category":"鏡位與視角","source_numbers":[18],"function":"以極高視點看清場景配置與群體關係。","prompt_fragment":"bird's-eye view directly over the scene, readable layout, small-scale subjects"},
+    {"id":"VP-019","canonical_key":"worms-eye-view","shortcut":"/WORMSEYEVIEW","aliases":["/WORMSVIEW"],"name_zh":"蟲視仰角","category":"鏡位與視角","source_numbers":[19],"function":"貼近地面向上觀看，誇大高度與壓迫。","prompt_fragment":"worm's-eye view near ground level, extreme upward perspective, towering scale"},
 
     {"id":"VP-020","canonical_key":"fog","shortcut":"/FOG","name_zh":"濃霧","category":"天氣與氛圍","source_numbers":[20],"function":"降低遠景能見度並建立層次與未知感。","prompt_fragment":"atmospheric fog surrounding the scene, reduced distant visibility, layered depth"},
     {"id":"VP-021","canonical_key":"mist","shortcut":"/MIST","name_zh":"薄霧","category":"天氣與氛圍","source_numbers":[21],"function":"加入輕柔水氣與低對比空氣感。","prompt_fragment":"soft light mist over the environment, delicate haze, gentle low-contrast atmosphere"},
@@ -73,7 +108,7 @@
     {"id":"VP-031","canonical_key":"neon-lights","shortcut":"/NEONLIGHTS","name_zh":"霓虹燈光","category":"燈光","source_numbers":[31],"function":"使用彩色霓虹、反射與城市夜景建立活力。","prompt_fragment":"vibrant neon lighting, colored reflections on wet surfaces, layered urban night ambience"},
     {"id":"VP-032","canonical_key":"cyberpunk","shortcut":"/CYBERPUNK","name_zh":"賽博龐克","category":"燈光","source_numbers":[32,71],"source_sections":["燈光","類型與世界觀"],"function":"結合高科技、低生活、霓虹與反烏托邦城市線索。","prompt_fragment":"cyberpunk world, high-tech low-life atmosphere, dense neon signage, dystopian urban layers"},
     {"id":"VP-033","canonical_key":"dark-moody","shortcut":"/DARKMOODY","name_zh":"暗黑情緒","category":"燈光","source_numbers":[33,52],"source_sections":["燈光","美學風格"],"function":"以低調光、深陰影與有限色彩建立神祕壓力。","prompt_fragment":"dark moody lighting, deep shadows, restrained highlights, rich low-key tones"},
-    {"id":"VP-034","canonical_key":"soft-lighting","shortcut":"/SOFTLIGHTING","name_zh":"柔光","category":"燈光","source_numbers":[34],"function":"以大面積漫射光降低陰影硬度。","prompt_fragment":"gentle diffused soft lighting, broad source, smooth tonal transitions, flattering shadows"},
+    {"id":"VP-034","canonical_key":"soft-lighting","shortcut":"/SOFTLIGHTING","aliases":["/SOFTLIGHT"],"name_zh":"柔光","category":"燈光","source_numbers":[34],"function":"以大面積漫射光降低陰影硬度。","prompt_fragment":"gentle diffused soft lighting, broad source, smooth tonal transitions, flattering shadows"},
     {"id":"VP-035","canonical_key":"dramatic-lighting","shortcut":"/DRAMATICLIGHTING","name_zh":"戲劇性布光","category":"燈光","source_numbers":[35],"function":"用強對比與方向性塑造衝突及焦點。","prompt_fragment":"strong high-contrast dramatic lighting, motivated directional key, sculpted shadow pattern"},
     {"id":"VP-036","canonical_key":"rim-light","shortcut":"/RIMLIGHT","name_zh":"輪廓光","category":"燈光","source_numbers":[36],"function":"以背側光勾勒主體外緣並分離背景。","prompt_fragment":"controlled rim light tracing the subject's edge, dark background separation"},
     {"id":"VP-037","canonical_key":"backlight","shortcut":"/BACKLIGHT","name_zh":"逆光","category":"燈光","source_numbers":[37],"function":"從主體後方打光，形成輪廓、半透明與耀光。","prompt_fragment":"subject backlit from behind, luminous edge separation, controlled flare, readable silhouette"},
@@ -141,7 +176,93 @@
     {"id":"VP-093","canonical_key":"fire","shortcut":"/FIRE","name_zh":"火焰特效","category":"創意特效","source_numbers":[96],"function":"加入火焰、熱光、煙與被照亮物體的物理反應。","prompt_fragment":"dynamic fire effect, bright hot core, turbulent flames, smoke and warm light cast on nearby surfaces"},
     {"id":"VP-094","canonical_key":"smoke","shortcut":"/SMOKE","name_zh":"煙霧特效","category":"創意特效","source_numbers":[97],"function":"以煙的體積、流向與遮擋增加深度與神祕。","prompt_fragment":"volumetric smoke, visible flow and density variation, atmospheric occlusion and depth"},
     {"id":"VP-095","canonical_key":"glitch","shortcut":"/GLITCH","name_zh":"數位故障","category":"創意特效","source_numbers":[98],"function":"用色彩分離、掃描線與資料破損建立科技扭曲。","prompt_fragment":"digital glitch effect, controlled RGB channel offset, scan-line distortion, readable subject retained"},
-    {"id":"VP-096","canonical_key":"dreamcore","shortcut":"/DREAMCORE","name_zh":"夢核","category":"創意特效","source_numbers":[99],"function":"以熟悉卻不合理的場景、柔霧與夢境邏輯建立異樣感。","prompt_fragment":"dreamcore atmosphere, familiar yet impossible environment, soft haze, uncanny dream logic"
-    }
+    {"id":"VP-096","canonical_key":"dreamcore","shortcut":"/DREAMCORE","name_zh":"夢核","category":"創意特效","source_numbers":[99],"function":"以熟悉卻不合理的場景、柔霧與夢境邏輯建立異樣感。","prompt_fragment":"dreamcore atmosphere, familiar yet impossible environment, soft haze, uncanny dream logic"},
+
+    {"id":"VP-097","canonical_key":"eye-level","shortcut":"/EYELEVEL","name_zh":"平視鏡位","category":"鏡位與視角","source_sections":["鏡位與視角"],"source_batch":"2026-09-15-set2","source_numbers":[3],"function":"將攝影機放在主體眼睛高度，建立中性、平等且自然的觀看關係。","prompt_fragment":"eye-level camera at the subject's eye height, neutral perspective, natural proportions"},
+    {"id":"VP-098","canonical_key":"dutch-angle","shortcut":"/DUTCHANGLE","name_zh":"荷蘭角／傾斜構圖","category":"鏡位與視角","source_sections":["鏡位與視角"],"source_batch":"2026-09-15-set2","source_numbers":[4],"function":"傾斜地平線以製造失衡、危機或心理不安。","prompt_fragment":"controlled Dutch angle, tilted horizon, deliberate visual tension, readable subject orientation"},
+    {"id":"VP-099","canonical_key":"isometric","shortcut":"/ISOMETRIC","name_zh":"等角視圖","category":"鏡位與視角","source_sections":["鏡位與視角"],"source_batch":"2026-09-15-set2","source_numbers":[10],"function":"用穩定的三分之四幾何視角清楚展示空間與物件關係。","prompt_fragment":"isometric three-quarter view, consistent parallel geometry, clean spatial relationships"},
+
+    {"id":"VP-100","canonical_key":"medium-shot","shortcut":"/MEDIUMSHOT","name_zh":"中景","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[3],"function":"以腰部或胸部以上取景兼顧表演與環境。","prompt_fragment":"medium shot, balanced upper-body framing, readable gesture and surrounding context"},
+    {"id":"VP-101","canonical_key":"full-body","shortcut":"/FULLBODY","name_zh":"全身取景","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[4],"function":"完整保留人物頭頂到腳底與必要落腳空間。","prompt_fragment":"full-body framing from head to toe, clean silhouette, visible stance and ground contact"},
+    {"id":"VP-102","canonical_key":"wide-frame","shortcut":"/WIDEFRAME","name_zh":"寬景框架／大全景","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[5],"function":"同時容納主體與較大環境，強調人物和空間關係。","prompt_fragment":"wide establishing frame, subject integrated with a broad environment, layered spatial context"},
+    {"id":"VP-103","canonical_key":"symmetry","shortcut":"/SYMMETRY","name_zh":"對稱構圖","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[6],"function":"沿中央軸平衡元素，建立秩序、儀式感或壓迫。","prompt_fragment":"precise symmetrical composition, balanced visual weight across the central axis"},
+    {"id":"VP-104","canonical_key":"center-frame","shortcut":"/CENTERFRAME","name_zh":"中央構圖","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[7],"function":"將主要主體置中，建立直接、圖像化的焦點。","prompt_fragment":"center-framed subject, direct visual hierarchy, clean poster-like focal composition"},
+    {"id":"VP-105","canonical_key":"rule-of-thirds","shortcut":"/RULEOFTHIRDS","name_zh":"三分法構圖","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[8],"function":"把主體與關鍵線條配置於三分交點，保留自然視線動線。","prompt_fragment":"rule-of-thirds composition, subject placed on a power point, balanced directional space"},
+    {"id":"VP-106","canonical_key":"negative-space","shortcut":"/NEGATIVESPACE","name_zh":"負空間／留白","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[9],"function":"用大面積簡潔空間強化孤立、尺度或文字配置彈性。","prompt_fragment":"intentional negative space around the subject, uncluttered background, strong visual isolation"},
+    {"id":"VP-107","canonical_key":"foreground-frame","shortcut":"/FOREGROUNDFRAME","name_zh":"前景框景","category":"構圖與取景","source_batch":"2026-09-15-set2","source_numbers":[10],"function":"利用門框、物件或人物局部形成前景框，增加深度與窺視感。","prompt_fragment":"foreground framing element around the subject, layered depth, controlled occlusion"},
+
+    {"id":"VP-108","canonical_key":"film-still","shortcut":"/FILMSTILL","name_zh":"電影劇照感","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[2],"function":"讓靜態畫面像故事中被截取的一個敘事瞬間。","prompt_fragment":"narrative film still, motivated action beat, cinematic blocking and production design"},
+    {"id":"VP-109","canonical_key":"anamorphic","shortcut":"/ANAMORPHIC","name_zh":"變形寬銀幕鏡頭感","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[3],"function":"用寬畫幅、橢圓散景與受控水平耀光建立變形鏡頭語言。","prompt_fragment":"anamorphic widescreen look, oval bokeh, restrained horizontal flare, cinematic edge character"},
+    {"id":"VP-110","canonical_key":"large-format-imax","shortcut":"/IMAX","name_zh":"大型格式尺度感","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[4],"function":"以高垂直資訊量、巨大尺度與清晰空間層次表達大型格式觀感。","prompt_fragment":"large-format cinematic scale, expansive vertical composition, immense spatial detail and clarity"},
+    {"id":"VP-111","canonical_key":"neon-noir","shortcut":"/NEONNOIR","name_zh":"霓虹黑色電影","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[6],"function":"融合黑色電影陰影、夜間雨地反射與有限霓虹色。","prompt_fragment":"neon-noir night, hard shadow geometry, wet reflections, restrained saturated practical lights"},
+    {"id":"VP-112","canonical_key":"vintage-film","shortcut":"/VINTAGEFILM","name_zh":"復古膠片外觀","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[7],"function":"以柔和反差、暖偏色、顆粒與暈光建立類比年代感。","prompt_fragment":"vintage film stock look, organic grain, soft contrast, subtle halation and aged color response"},
+    {"id":"VP-113","canonical_key":"seventies-cinema","shortcut":"/70SCINEMA","name_zh":"1970年代電影感","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[8],"function":"用暖土色、自然主義光線與較粗膠片質地建立七〇年代氣質。","prompt_fragment":"1970s cinema aesthetic, warm earthy palette, naturalistic lighting, textured film grain"},
+    {"id":"VP-114","canonical_key":"eighties-action","shortcut":"/80SACTION","name_zh":"1980年代動作片感","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[9],"function":"以英雄式低角度、強逆光、煙霧和飽和色建立八〇年代動作氣勢。","prompt_fragment":"1980s action cinema look, heroic low angle, strong backlight, atmospheric smoke, bold saturated accents"},
+    {"id":"VP-115","canonical_key":"indie-film","shortcut":"/INDIEFILM","name_zh":"獨立電影自然感","category":"電影外觀","source_batch":"2026-09-15-set2","source_numbers":[10],"function":"以貼近人物的自然光、生活化場景與克制構圖建立親密感。","prompt_fragment":"intimate indie-film still, natural available light, lived-in location, understated composition"},
+
+    {"id":"VP-116","canonical_key":"hard-light","shortcut":"/HARDLIGHT","name_zh":"硬光","category":"燈光","source_batch":"2026-09-15-set2","source_numbers":[3],"function":"使用小而直接的光源形成清楚、銳利的陰影邊界。","prompt_fragment":"hard directional light, crisp graphic shadows, high edge definition, controlled exposure"},
+    {"id":"VP-117","canonical_key":"chiaroscuro","shortcut":"/CHIAROSCURO","name_zh":"明暗對照光","category":"燈光","source_batch":"2026-09-15-set2","source_numbers":[8],"function":"用大面積黑暗與集中亮部塑造人物體積和戲劇衝突。","prompt_fragment":"chiaroscuro lighting, sculpted pools of light against deep shadow, dramatic tonal modeling"},
+    {"id":"VP-118","canonical_key":"spotlight","shortcut":"/SPOTLIGHT","name_zh":"聚光燈","category":"燈光","source_batch":"2026-09-15-set2","source_numbers":[9],"function":"以窄角光束隔離主體，讓周圍環境快速落入暗部。","prompt_fragment":"focused spotlight isolating the subject, controlled beam edge, surrounding falloff into darkness"},
+    {"id":"VP-119","canonical_key":"practical-light","shortcut":"/PRACTICALLIGHT","name_zh":"實景燈光","category":"燈光","source_batch":"2026-09-15-set2","source_numbers":[10],"function":"讓檯燈、招牌、螢幕等畫內光源成為可見且有動機的照明。","prompt_fragment":"motivated practical lights visible in frame, lamps and screens shaping believable local illumination"},
+
+    {"id":"VP-120","canonical_key":"product-hero","shortcut":"/PRODUCTHERO","name_zh":"商品主角照","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[41],"function":"讓商品成為唯一明確主角，以輪廓、材質與視線中心建立價值感。","prompt_fragment":"hero product shot, dominant product silhouette, premium material detail, controlled background separation"},
+    {"id":"VP-121","canonical_key":"luxury-ad","shortcut":"/LUXURYAD","name_zh":"精品廣告質感","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[42],"function":"用精準材質、克制色彩和高質感布光呈現高端定位。","prompt_fragment":"luxury commercial treatment, refined materials, restrained palette, precise specular lighting"},
+    {"id":"VP-122","canonical_key":"minimal-tech-ad","shortcut":"/APPLESTYLE","aliases":["/MINIMALTECHAD"],"name_zh":"極簡科技商品廣告","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[43],"function":"以乾淨留白、精密邊緣與單一產品焦點建立極簡科技感，不模仿特定品牌識別。","prompt_fragment":"minimal refined technology ad, clean negative space, precise product edges, neutral premium lighting, no brand imitation"},
+    {"id":"VP-123","canonical_key":"billboard","shortcut":"/BILLBOARD","name_zh":"看板式主視覺","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[44],"function":"用單一強焦點、大形狀與遠距可讀的簡潔畫面建立活動看板感。","prompt_fragment":"bold billboard campaign visual, one dominant focal idea, large readable shapes, uncluttered composition"},
+    {"id":"VP-124","canonical_key":"editorial-ad","shortcut":"/EDITORIALAD","name_zh":"時尚編輯式廣告","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[45],"function":"以時尚雜誌的姿態、造型與排版邏輯呈現商品。","prompt_fragment":"fashion editorial advertising, art-directed styling, deliberate pose, premium magazine composition"},
+    {"id":"VP-125","canonical_key":"beauty-shot","shortcut":"/BEAUTYSHOT","name_zh":"精修美感主照","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[46],"function":"聚焦商品或人物最具吸引力的表面、輪廓與高光細節。","prompt_fragment":"polished beauty shot, flawless hero detail, controlled highlights, clean premium finish"},
+    {"id":"VP-126","canonical_key":"floating-product","shortcut":"/FLOATINGPRODUCT","name_zh":"懸浮商品","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[47],"function":"讓商品乾淨懸浮並保留可信陰影、重心和材質反射。","prompt_fragment":"product suspended cleanly in space, believable soft shadow, stable orientation, premium material reflections"},
+    {"id":"VP-127","canonical_key":"macro-product","shortcut":"/MACROPRODUCT","name_zh":"商品微距細節","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[48],"function":"放大商品表面、接縫與材質工藝作為賣點。","prompt_fragment":"macro product photography, extreme surface detail, precise seams and finish, selective focus"},
+    {"id":"VP-128","canonical_key":"exploded-view","shortcut":"/EXPLODEDVIEW","name_zh":"爆炸分解圖","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[49],"function":"沿裝配軸分離零件，清楚展示構造與關係。","prompt_fragment":"clean exploded product view, components separated along assembly axes, accurate alignment and scale"},
+    {"id":"VP-129","canonical_key":"packshot","shortcut":"/PACKSHOT","name_zh":"標準商品包裝照","category":"商品與廣告","source_batch":"2026-09-15-set2","source_numbers":[50],"function":"在乾淨棚拍背景中準確呈現商品、包裝與標示。","prompt_fragment":"clean studio packshot, accurate product geometry and packaging, neutral background, controlled softbox reflections"},
+
+    {"id":"VP-130","canonical_key":"freeze-action","shortcut":"/FREEZEACTION","name_zh":"高速凝結動作","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[51],"function":"凝結高速運動的關鍵瞬間，保持姿勢、碎屑和接觸點清楚。","prompt_fragment":"high-speed freeze action at the decisive instant, crisp moving subject, suspended debris, readable contact point"},
+    {"id":"VP-131","canonical_key":"motion-blur","shortcut":"/MOTIONBLUR","name_zh":"運動模糊","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[52],"function":"沿真實運動方向加入模糊，讓主體或背景表現速度。","prompt_fragment":"directional motion blur aligned with movement, readable focal subject, dynamic background streaking"},
+    {"id":"VP-132","canonical_key":"speed-ramp","shortcut":"/SPEEDRAMP","name_zh":"速度變化／Speed Ramp","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[53],"function":"規劃慢—快—慢的時間節奏；單張只能暗示速度層次，真正效果需影片。","prompt_fragment":"slow-fast-slow speed-ramp beat across a continuous action, clear acceleration peak and deceleration","risk_qc":"Speed Ramp 是時間效果；單張影像只能呈現動勢暗示，不得宣稱已完成變速。以影片序列、時間碼、動作連續與速度曲線驗收。"},
+    {"id":"VP-133","canonical_key":"midair","shortcut":"/MIDAIR","name_zh":"空中懸停瞬間","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[54],"function":"捕捉跳躍或拋擲到達頂點的懸空姿勢。","prompt_fragment":"subject suspended at the apex of motion, believable body mechanics, clear separation from the ground"},
+    {"id":"VP-134","canonical_key":"impact-frame","shortcut":"/IMPACTFRAME","name_zh":"衝擊幀","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[55],"function":"集中呈現碰撞發生的一幀，以形變、碎屑和反作用強化力量。","prompt_fragment":"impact frame at the exact collision beat, visible compression, debris burst, strong reaction forces"},
+    {"id":"VP-135","canonical_key":"windblown","shortcut":"/WINDBLOWN","name_zh":"風動元素","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[56],"function":"讓頭髮、布料、塵土和植被沿一致風向運動。","prompt_fragment":"windblown hair, fabric and particles moving in one coherent direction, visible gust strength"},
+    {"id":"VP-136","canonical_key":"running-frame","shortcut":"/RUNNINGFRAME","name_zh":"奔跑動態幀","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[57],"function":"用可信步態、前傾重心和擺臂呈現奔跑。","prompt_fragment":"dynamic running frame, believable gait phase, forward center of gravity, coordinated arm swing"},
+    {"id":"VP-137","canonical_key":"jump-cut-frame","shortcut":"/JUMPCUTFRAME","name_zh":"跳接構想幀","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[58],"function":"規劃刻意省略中間時間的突變剪接；單張只可作為跳接前後的設計幀。","prompt_fragment":"jump-cut concept with a deliberate discontinuity between matched compositions, surprising editorial transition","risk_qc":"Jump Cut 是剪輯關係；單張影像不能完成跳接。至少用前後兩幀或影片序列驗收構圖對位、時間省略與敘事可讀性。"},
+    {"id":"VP-138","canonical_key":"collision","shortcut":"/COLLISION","name_zh":"碰撞匯聚瞬間","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[59],"function":"呈現兩股動勢在同一接觸點匯聚的戲劇時刻。","prompt_fragment":"dramatic collision moment, converging trajectories, clear contact point, opposing reaction forces"},
+    {"id":"VP-139","canonical_key":"chaos-frame","shortcut":"/CHAOSFRAME","name_zh":"高密度混亂動態","category":"動作與動態","source_batch":"2026-09-15-set2","source_numbers":[60],"function":"在高能量、多元素畫面中保留一個可讀主焦點和動勢方向。","prompt_fragment":"dense energetic chaos frame, layered action and debris, one readable focal subject, coherent motion flow"},
+
+    {"id":"VP-140","canonical_key":"impossible-angle","shortcut":"/IMPOSSIBLEANGLE","name_zh":"不可能攝影機視角","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[61],"function":"從現實攝影機難以到達的位置觀看場景，同時維持空間可讀性。","prompt_fragment":"physically impossible camera viewpoint, coherent scene geometry, believable perspective and spatial continuity"},
+    {"id":"VP-141","canonical_key":"gravity-off","shortcut":"/GRAVITYOFF","name_zh":"失重漂浮","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[62],"function":"讓人物與物件在無重力中以一致慣性和方向漂浮。","prompt_fragment":"zero-gravity scene, objects floating naturally with coherent inertia, no unexplained support"},
+    {"id":"VP-142","canonical_key":"giant-object","shortcut":"/GIANTOBJECT","name_zh":"巨物尺度反轉","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[63],"function":"把日常物件巨大化，透過人物、建築與大氣透視證明尺度。","prompt_fragment":"ordinary object at monumental scale, human and architectural scale references, atmospheric perspective"},
+    {"id":"VP-143","canonical_key":"mini-world","shortcut":"/MINIWORLD","name_zh":"可信微縮世界","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[64],"function":"建立具完整地貌、建築與微小活動的微型世界。","prompt_fragment":"tiny believable miniature world, coherent terrain and architecture, readable micro-scale activity"},
+    {"id":"VP-144","canonical_key":"mirror-world","shortcut":"/MIRRORWORLD","name_zh":"鏡像平行世界","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[65],"function":"建立與現實對稱或反轉、但規則一致的另一層世界。","prompt_fragment":"alternate mirror world, coherent reversed spatial rules, matched landmarks with meaningful differences"},
+    {"id":"VP-145","canonical_key":"dream-logic","shortcut":"/DREAMLOGIC","name_zh":"夢境邏輯","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[66],"function":"讓不合理事件遵循可感知的情緒或象徵因果。","prompt_fragment":"surreal but coherent dream logic, emotional cause-and-effect, recurring visual motifs"},
+    {"id":"VP-146","canonical_key":"infinite-space","shortcut":"/INFINITE","name_zh":"無限重複空間","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[67],"function":"用重複結構、遞迴或消失點創造無盡空間。","prompt_fragment":"endless repeating space, coherent recursive architecture, strong vanishing-point depth"},
+    {"id":"VP-147","canonical_key":"portal","shortcut":"/PORTAL","name_zh":"跨世界入口","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[68],"function":"用清楚邊界連接兩個不同環境，維持透視、遮擋和光線互動。","prompt_fragment":"portal connecting two distinct worlds, precise boundary, matched perspective, cross-environment light spill"},
+    {"id":"VP-148","canonical_key":"scale-illusion","shortcut":"/SCALEILLUSION","name_zh":"強制透視尺度錯覺","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[69],"function":"利用攝影機位置與前後景關係製造假尺度。","prompt_fragment":"forced-perspective scale illusion, carefully aligned foreground and background subjects, coherent camera geometry"},
+    {"id":"VP-149","canonical_key":"reality-shift","shortcut":"/REALITYSHIFT","name_zh":"現實環境融合","category":"超現實與不可能","source_batch":"2026-09-15-set2","source_numbers":[70],"function":"讓兩種不相容環境沿可理解的過渡規則融合。","prompt_fragment":"reality-shift environment, two impossible worlds blending through a coherent transition zone"},
+
+    {"id":"VP-150","canonical_key":"fashion-editorial","shortcut":"/FASHIONEDITORIAL","name_zh":"高端時尚編輯攝影","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[71],"function":"用造型、姿態、場景與藝術指導建立雜誌時尚敘事。","prompt_fragment":"high-fashion editorial photography, art-directed styling, intentional pose and premium composition"},
+    {"id":"VP-151","canonical_key":"street-photo","shortcut":"/STREETPHOTO","name_zh":"街頭紀實感","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[72],"function":"以自然瞬間、街道層次和非擺拍姿態建立紀實感。","prompt_fragment":"candid street-photography feel, spontaneous gesture, layered public space, available light"},
+    {"id":"VP-152","canonical_key":"paparazzi","shortcut":"/PAPARAZZI","name_zh":"突發閃光抓拍感","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[73],"function":"用直接閃光、快速構圖和非預期表情建立突發抓拍能量。","prompt_fragment":"paparazzi-style candid energy, direct on-camera flash, hurried framing, spontaneous expression"},
+    {"id":"VP-153","canonical_key":"polaroid","shortcut":"/POLAROID","name_zh":"即時成像照片感","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[74],"function":"模擬即時相紙的柔和銳度、偏色與白邊實體照片。","prompt_fragment":"instant-film photograph, soft detail, gentle color shift, physical white border and subtle exposure variation"},
+    {"id":"VP-154","canonical_key":"35mm-film","shortcut":"/35MM","name_zh":"35mm 膠片感","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[75],"function":"以便攜攝影的自然視角、可見顆粒和有限寬容度建立經典感。","prompt_fragment":"35mm film photography look, organic grain, natural perspective, subtle highlight roll-off"},
+    {"id":"VP-155","canonical_key":"medium-format","shortcut":"/MEDIUMFORMAT","name_zh":"中片幅攝影感","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[76],"function":"呈現豐富階調、細膩材質與柔順景深過渡。","prompt_fragment":"medium-format photography look, rich tonal depth, fine material detail, smooth focus falloff"},
+    {"id":"VP-156","canonical_key":"disposable-camera","shortcut":"/DISPOSABLECAM","name_zh":"即可拍相機感","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[77],"function":"用直接閃光、偏色、顆粒與不完美構圖建立隨手懷舊感。","prompt_fragment":"disposable-camera aesthetic, imperfect direct flash, visible grain, slight color cast, casual framing"},
+    {"id":"VP-157","canonical_key":"contact-sheet","shortcut":"/CONTACTSHEET","name_zh":"接觸印樣／多格選片","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[78],"function":"將同一拍攝中的多個相鄰瞬間整理成有序格網。","prompt_fragment":"photographic contact sheet, ordered grid of multiple related moments, consistent subject and exposure"},
+    {"id":"VP-158","canonical_key":"lookbook","shortcut":"/LOOKBOOK","name_zh":"造型型錄系列","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[79],"function":"以一致背景、人物和視覺系統呈現多套造型或商品系列。","prompt_fragment":"clean fashion lookbook series, consistent model and background, varied outfits, unified visual system"},
+    {"id":"VP-159","canonical_key":"cover-story","shortcut":"/COVERSTORY","name_zh":"雜誌封面人物照","category":"攝影與編輯","source_batch":"2026-09-15-set2","source_numbers":[80],"function":"以強眼神、清楚輪廓和可留標題空間建立封面主視覺。","prompt_fragment":"magazine cover portrait, commanding eye contact, clean silhouette, intentional masthead and cover-line space"},
+
+    {"id":"VP-160","canonical_key":"behind-the-scenes","shortcut":"/BTS","aliases":["/BEHINDTHESCENES","/MAKINGOF"],"name_zh":"幕後製作紀錄","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[81,82,90],"function":"展示正式畫面背後的拍攝配置、工作流程與製作工藝。","prompt_fragment":"behind-the-scenes production documentation, visible crew and full setup, authentic making-of context"},
+    {"id":"VP-161","canonical_key":"set-photo","shortcut":"/SETPHOTO","name_zh":"片場人物照","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[83],"function":"把主體置於可辨識的拍攝場景中，同時保留片場背景線索。","prompt_fragment":"subject photographed on an active production set, visible but controlled set context"},
+    {"id":"VP-162","canonical_key":"camera-rig","shortcut":"/CAMERARIG","name_zh":"攝影機與承托系統","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[84],"function":"清楚展示攝影機、鏡頭、承托、監看與線材的實際組合。","prompt_fragment":"production camera rig in use, visible lens, support system, monitor and organized cabling"},
+    {"id":"VP-163","canonical_key":"lighting-rig","shortcut":"/LIGHTINGRIG","name_zh":"燈具與控光配置","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[85],"function":"展示燈具、柔光、旗板、腳架與光線方向的完整關係。","prompt_fragment":"behind-the-scenes lighting rig, visible fixtures, modifiers, flags and stands, readable lighting direction"},
+    {"id":"VP-164","canonical_key":"director-view","shortcut":"/DIRECTORVIEW","name_zh":"導演工作視角","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[86],"function":"從導演位置呈現表演、攝影機與片場調度關係。","prompt_fragment":"director's working viewpoint on set, performers, camera position and blocking visible in context"},
+    {"id":"VP-165","canonical_key":"video-village","shortcut":"/VIDEOVILLAGE","name_zh":"監看區／Video Village","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[87],"function":"呈現團隊在監看螢幕前審視畫面與協作。","prompt_fragment":"crew reviewing production monitors at video village, authentic set workflow, screen content not legible"},
+    {"id":"VP-166","canonical_key":"studio-floor","shortcut":"/STUDIOFLOOR","name_zh":"攝影棚全景","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[88],"function":"以廣角交代棚內佈景、器材、工作區和安全動線。","prompt_fragment":"wide studio-floor overview, set, equipment, work zones and clear safety pathways"},
+    {"id":"VP-167","canonical_key":"before-after","shortcut":"/BEFOREAFTER","name_zh":"前後製對照","category":"幕後與製作","source_batch":"2026-09-15-set2","source_numbers":[89],"function":"用一致構圖並列原始拍攝與完成處理，清楚顯示製作差異。","prompt_fragment":"before-and-after production comparison, matched composition, raw capture beside polished final result"},
+
+    {"id":"VP-168","canonical_key":"tiny-planet","shortcut":"/TINYPLANET","name_zh":"小行星投影效果","category":"超現實與不可能","source_sections":["創意實驗"],"source_batch":"2026-09-15-set2","source_numbers":[92],"function":"把全景空間包覆成球形小世界，讓地平線形成環狀。","prompt_fragment":"tiny-planet stereographic projection, spherical world, wrapped horizon, coherent radial scene geometry"},
+    {"id":"VP-169","canonical_key":"through-glass","shortcut":"/THROUGHGLASS","name_zh":"隔著玻璃拍攝","category":"攝影與鏡頭效果","source_sections":["創意實驗"],"source_batch":"2026-09-15-set2","source_numbers":[94],"function":"透過玻璃、窗面或透明材質疊加反射、折射與前景層次。","prompt_fragment":"view through layered glass, controlled reflections and refraction, readable subject beyond the surface"},
+    {"id":"VP-170","canonical_key":"xray-style","shortcut":"/XRAYSTYLE","name_zh":"X光透視風格","category":"藝術與渲染","source_sections":["創意實驗"],"source_batch":"2026-09-15-set2","source_numbers":[96],"function":"以透明外殼與高反差內部結構呈現非醫療的透視示意。","prompt_fragment":"stylized X-ray cut-through visualization, translucent exterior, clearly revealed internal structure, non-diagnostic"},
+    {"id":"VP-171","canonical_key":"thermal","shortcut":"/THERMAL","name_zh":"熱成像風格","category":"藝術與渲染","source_sections":["創意實驗"],"source_batch":"2026-09-15-set2","source_numbers":[97],"function":"用偽彩色熱度分布表達冷熱差異，不作測量或診斷。","prompt_fragment":"stylized thermal-imaging palette, clear hot-to-cold gradients, readable subject heat distribution"},
+    {"id":"VP-172","canonical_key":"blueprint","shortcut":"/BLUEPRINT","name_zh":"工程藍圖風格","category":"藝術與渲染","source_sections":["創意實驗"],"source_batch":"2026-09-15-set2","source_numbers":[98],"function":"以藍底白線、尺寸註記與正投影建立技術圖面感。","prompt_fragment":"technical blueprint style, white linework on blue field, orthographic views and measured annotations"},
+    {"id":"VP-173","canonical_key":"cutaway","shortcut":"/CUTAWAY","name_zh":"剖面揭示圖","category":"藝術與渲染","source_sections":["創意實驗"],"source_batch":"2026-09-15-set2","source_numbers":[99],"function":"移除部分外殼以清楚揭示內部空間、零件與層級。","prompt_fragment":"clean cutaway illustration, exterior section removed, internal layers and components clearly visible"}
   ]
 }

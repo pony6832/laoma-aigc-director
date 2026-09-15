@@ -38,6 +38,19 @@ class ReferenceContractTests(unittest.TestCase):
         self.assertIn("| 方法 | 來源檔案 | 快照／雜湊或版本 | 來源等級 | 適用版本／入口 | 同步日期 | 排除內容 |", text)
         self.assertGreaterEqual(len(re.findall(r"\b[0-9a-f]{64}\b", text)), 8)
 
+    def test_cloud_knowledge_root_is_a_fixed_cross_account_contract(self):
+        folder_id = "1F0RPxifumzVJncvweJEzOZtWjbmTCqAY"
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        weekly = (ROOT / "references" / "weekly-evolution.md").read_text(encoding="utf-8")
+        manifest = (ROOT / "references" / "source-manifest.md").read_text(encoding="utf-8")
+
+        for text in (skill, weekly, manifest):
+            self.assertIn(folder_id, text)
+        self.assertIn("唯一雲端存放根目錄", weekly)
+        self.assertIn("不得存到「我的雲端硬碟」根目錄", skill)
+        self.assertIn("個人與公司版本", weekly)
+        self.assertIn("parent_ids", weekly)
+
     def test_knowledge_snapshot_is_actionable_and_self_contained(self):
         text = (ROOT / "references" / "knowledge-snapshot-v1.md").read_text(
             encoding="utf-8"

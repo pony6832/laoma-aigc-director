@@ -17,6 +17,7 @@ description: Use when the user requests AIGC film production, character or visua
 - 原始輸入與舊版本不可覆蓋；修改鎖定產物時先建立新版本。
 - 沒有實體輸出、雜湊、QC 與核准證據時，不得把案件標成 Gate 4 `complete`，也不得聲稱已生成或已成片。
 - 會變動的模型能力、價格、額度、入口與介面在執行時以當前官方資料及實際入口重新查證。
+- 所有新建或同步的雲端知識庫、索引、快照與週更產物，固定存入 Google Drive 資料夾 `1F0RPxifumzVJncvweJEzOZtWjbmTCqAY`（`=AI相關(學習/參考)整理=`）。建立前先檢查此資料夾；除非使用者本次明確指定其他位置，不得存到「我的雲端硬碟」根目錄或另建散落的知識庫資料夾。個人與公司版本可保留各自所有權，但完成後都要回讀 Drive metadata，確認 `parent_ids` 指向此資料夾。
 
 ## 資訊優先序
 

@@ -3,7 +3,7 @@
 ## 現行V2與每週更新
 
 2026-09-11起現行個人主表為 `1E9MrvDlFdCEpLQ8RbARLi8gSomQaYWb25Kxik_xIIdc`；公司同步副本為 `1OpLwd3p3UrJCHrhYGdjBYq2WwVynsKn_OAtzClq-7bU`，每週以個人主表為準同步。
-新舊表同置資料夾 `1F0RPxifumzVJncvweJEzOZtWjbmTCqAY`。
+唯一雲端知識庫存放根目錄為 `=AI相關(學習/參考)整理=`（`1F0RPxifumzVJncvweJEzOZtWjbmTCqAY`）。所有個人與公司版本、同步副本、索引、雲端快照及週更產物都必須存入此處；只有使用者本次明確指定其他位置時例外。建立、複製或移動後必須回讀 Drive metadata，確認 `parent_ids`。
 現行快照由 `references/evolving-library/active.json` 指定，包含每檔SHA-256與來源分頁範圍；初版724項包含712筆舊資料與12筆補充。2026-09-11核心平台批次再加入10項，當時共734項。2026-09-15雲端權威主庫移出99項辦公通用指令後，`02_提示詞總庫` 為635項影像專屬知識；不可竄改的舊本地快照仍保留歷史列，但查詢器會排除 `主分類=通用指令`，新快照發布器也會拒收。辦公資料另存於個人與公司兩份「老馬辦公工作知識庫 V1」。
 細節見[每週進化](weekly-evolution.md)。以下V1來源記錄保留供追溯，不是最新能力資料。
 

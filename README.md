@@ -45,6 +45,12 @@ $env:PYTHONUTF8='1'
 python scripts/query_cinematic_grammar.py "把角色的抽象焦慮改成可拍攝的表演"
 ```
 
+查詢角度、天氣、燈光、場景、風格、渲染與特效提示元件：
+
+```powershell
+python scripts/query_visual_prompts.py "雨夜 霓虹 電影感"
+```
+
 ## 開發驗證
 
 ```powershell

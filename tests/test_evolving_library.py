@@ -34,6 +34,32 @@ class EvolvingLibraryTests(unittest.TestCase):
             bad["sheets"][0]["rows"][1][3]="MISSING"
             with self.assertRaisesRegex(ValueError,"unknown source"):
                 publish(bad,d,"2026-09-11-test")
+
+    def test_office_general_commands_are_rejected_from_new_director_snapshot(self):
+        with tempfile.TemporaryDirectory() as d:
+            bad = self.fixture()
+            bad["sheets"][0]["rows"].append(
+                ["CMD-001", "通用摘要", "通用指令", "S1", "使用者資料", "未實測", "可參考", "2026-09-15"]
+            )
+            with self.assertRaisesRegex(ValueError, "office general command"):
+                publish(bad, d, "2026-09-15-office-split")
+
+    def test_query_hides_legacy_general_commands_from_active_snapshot(self):
+        with tempfile.TemporaryDirectory() as d:
+            payload = self.fixture()
+            payload["sheets"][0]["rows"].append(
+                ["CMD-001", "/PLAIN", "通用指令", "S1", "使用者資料", "未實測", "可參考", "2026-09-11"]
+            )
+            # Simulate a pre-split historical snapshot that remains immutable for audit.
+            target = publish(self.fixture(), d, "2026-09-11-history")
+            sheet = json.loads((target / "sheet-00.json").read_text(encoding="utf-8"))
+            sheet["rows"].append(payload["sheets"][0]["rows"][-1])
+            (target / "sheet-00.json").write_text(json.dumps(sheet, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+            manifest = json.loads((target / "manifest.json").read_text(encoding="utf-8"))
+            import hashlib
+            manifest["sheets"][0]["sha256"] = hashlib.sha256((target / "sheet-00.json").read_bytes()).hexdigest()
+            (target / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+            self.assertEqual(query_library(Path(d), "/PLAIN", sheet_name="02_提示詞總庫"), [])
     def test_existing_snapshot_is_preserved(self):
         with tempfile.TemporaryDirectory() as d:
             publish(self.fixture(),d,"2026-09-11-test")

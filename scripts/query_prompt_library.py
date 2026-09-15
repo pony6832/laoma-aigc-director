@@ -54,7 +54,14 @@ def _iter_records(library: Path, sheet: dict[str, Any]):
     headers = rows[header_index]
     for row_index, row in enumerate(rows[header_index + 1 :], start=header_row + 1):
         record = _record_from_row(headers, row, sheet.get("header_overrides", {}))
-        if record and record.get("生命週期") != "停用":
+        # The 99 general-purpose office commands were split into a separate
+        # office knowledge base on 2026-09-15.  Historical snapshots remain
+        # immutable for provenance, but must not affect director decisions.
+        if (
+            record
+            and record.get("生命週期") != "停用"
+            and record.get("主分類") != "通用指令"
+        ):
             yield row_index, record
 
 

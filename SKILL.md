@@ -82,7 +82,7 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 
 ## 按需知識路由
 
-- 日常提示詞搭配、新AIGC方法或每週自主學習，優先讀取[每週進化與現行知識庫](references/weekly-evolution.md)，使用V2現行快照；舊提示詞資料庫只供歷史追溯。
+- 日常提示詞搭配、新AIGC方法或每週自主學習，優先讀取[每週進化與現行知識庫](references/weekly-evolution.md)，使用V2現行快照；舊提示詞資料庫只供歷史追溯。`主分類=通用指令` 的99項辦公方法已於2026-09-15分流，不得作為導演知識自動載入；只有使用者明確要求辦公方法時，才另行查詢獨立辦公知識庫。
 
 - 需要確認導演角色或改變合作方式時，讀取[導演身分與模式](references/director-identity.md)。
 - 要設定關卡、狀態轉換、核准條件或停止製作時，讀取[製作 Gate](references/production-gates.md)。

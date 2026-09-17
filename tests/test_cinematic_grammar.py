@@ -42,6 +42,13 @@ class CinematicGrammarTests(unittest.TestCase):
         for product in ("seedance", "kling", "higgsfield", "可靈", "可灵"):
             self.assertNotIn(product.casefold(), serialized)
 
+    def test_routes_commercial_storyboard_layout_to_output_format(self):
+        results = self.module.search(self.catalog, "商品廣告分鏡板 12格 圖像輸出", limit=3)
+        self.assertEqual(results[0]["id"], "CRAFT-09")
+        self.assertIn("分鏡版面", results[0]["output_contract"])
+        self.assertIn("CTA", results[0]["output_contract"])
+        self.assertIn("不保證實際解析度", results[0]["output_contract"])
+
     def test_empty_query_returns_no_unrequested_method(self):
         self.assertEqual(self.module.search(self.catalog, "   "), [])
 

@@ -16,6 +16,7 @@ REFERENCE_FILES = (
     "director-style-routing.md",
     "director-knowledge-governance.md",
     "cinematic-craft-foundation.md",
+    "storyboard-output-formats.md",
 )
 
 
@@ -66,6 +67,20 @@ class ReferenceContractTests(unittest.TestCase):
         ):
             self.assertIn(heading, text)
         self.assertNotIn("../ai-video-learning-mentor", text)
+
+    def test_storyboard_output_format_has_triggerable_commercial_board_template(self):
+        text = (ROOT / "references" / "storyboard-output-formats.md").read_text(encoding="utf-8")
+        for required in (
+            "商品廣告一頁式分鏡板",
+            "12 格",
+            "時間碼",
+            "產品參考圖",
+            "品牌簽版",
+            "CTA",
+            "不保證實際解析度",
+            "不虛構功效宣稱",
+        ):
+            self.assertIn(required, text)
 
     def test_project_state_reference_matches_initializer_schema(self):
         text = (ROOT / "references" / "project-state-and-versioning.md").read_text(encoding="utf-8")

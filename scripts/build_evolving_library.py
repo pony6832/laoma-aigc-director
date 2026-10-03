@@ -19,15 +19,21 @@ def publish(payload, library, version):
     names = [s["name"] for s in sheets]
     if len(names) != len(set(names)):
         raise ValueError("duplicate sheet")
-    catalog = next(s for s in sheets if s["name"] == "02_提示詞總庫")
-    sources = next(s for s in sheets if s["name"] == "05_來源登錄")
-    source_ids = {r[0] for r in sources["rows"][1:] if r}
-    headers = catalog["rows"][0]
+    by_name = {s["name"]: s for s in sheets}
+    for required_sheet in ("02_提示詞總庫", "05_來源登錄"):
+        if required_sheet not in by_name:
+            raise ValueError(f"missing required sheet: {required_sheet}")
+    catalog = by_name["02_提示詞總庫"]
+    sources = by_name["05_來源登錄"]
+    source_header = sources.get("header_row", 1)
+    source_ids = {r[0] for r in sources["rows"][source_header:] if r}
+    catalog_header = catalog.get("header_row", 1)
+    headers = catalog["rows"][catalog_header - 1]
     required = ["知識ID", "中文名稱", "主分類", "來源ID", "證據等級", "實測狀態", "生命週期", "查核日期"]
     if any(k not in headers for k in required):
         raise ValueError("missing required column")
     seen = set()
-    for row in catalog["rows"][1:]:
+    for row in catalog["rows"][catalog_header:]:
         if not any(row):
             continue
         record = dict(zip(headers, row))
@@ -52,7 +58,10 @@ def publish(payload, library, version):
                 "captured_at":payload["captured_at"], "version":version, "sheets":[]}
     for i, sheet in enumerate(sheets):
         filename = f"sheet-{i:02d}.json"
-        content = dict(sheet, header_row=1)
+        header_row = sheet.get("header_row", 1)
+        if not isinstance(header_row, int) or not 1 <= header_row <= max(1, len(sheet["rows"])):
+            raise ValueError(f"invalid header_row for sheet: {sheet['name']}")
+        content = dict(sheet, header_row=header_row)
         path = target / filename
         path.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
         manifest["sheets"].append({"name":sheet["name"], "file":filename,
@@ -60,7 +69,7 @@ def publish(payload, library, version):
     (target / "manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8",newline="\n")
     active = library / "active.json"
     pending = library / "active.pending.json"
-    pending.write_text(json.dumps({"snapshot":version},ensure_ascii=False)+"\n",encoding="utf-8",newline="\n")
+    pending.write_text(json.dumps({"snapshot":version, "captured_at":payload["captured_at"]},ensure_ascii=False)+"\n",encoding="utf-8",newline="\n")
     pending.replace(active)
     return target
 

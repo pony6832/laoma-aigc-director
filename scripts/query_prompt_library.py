@@ -3,11 +3,56 @@
 from __future__ import annotations
 
 import argparse
+from datetime import date
 import hashlib
 import json
 from pathlib import Path
 import sys
 from typing import Any
+
+STALE_AFTER_DAYS = 8
+_REVIEW_DATE_KEYS = ("複查日期", "複查日")
+
+
+def _resolve_snapshot(library: Path) -> Path:
+    library = Path(library).resolve()
+    active = library / "active.json"
+    if active.is_file():
+        target = (library / json.loads(active.read_text(encoding="utf-8"))["snapshot"]).resolve()
+        if library not in target.parents:
+            raise ValueError("active snapshot outside library")
+        return target
+    return library
+
+
+def snapshot_info(library: Path, today: date | None = None) -> dict[str, Any]:
+    """Report which snapshot answers queries and how old it is."""
+    target = _resolve_snapshot(library)
+    manifest = _load_manifest(target)
+    captured = manifest.get("captured_at")
+    info: dict[str, Any] = {
+        "version": manifest.get("version", target.name),
+        "captured_at": captured,
+        "sheets": [sheet["name"] for sheet in manifest.get("sheets", [])],
+    }
+    try:
+        age = ((today or date.today()) - date.fromisoformat(str(captured)[:10])).days
+    except ValueError:
+        age = None
+    info["age_days"] = age
+    info["stale"] = age is None or age > STALE_AFTER_DAYS
+    return info
+
+
+def _review_overdue(record: dict[str, Any], today: date) -> bool:
+    for key in _REVIEW_DATE_KEYS:
+        value = str(record.get(key) or "")[:10]
+        try:
+            if date.fromisoformat(value) < today:
+                return True
+        except ValueError:
+            continue
+    return False
 
 
 def _load_manifest(library: Path) -> dict[str, Any]:
@@ -66,20 +111,20 @@ def _iter_records(library: Path, sheet: dict[str, Any]):
 
 
 def query_library(
-    library: Path, query: str, *, sheet_name: str | None = None, limit: int = 5
+    library: Path,
+    query: str,
+    *,
+    sheet_name: str | None = None,
+    limit: int = 5,
+    today: date | None = None,
 ) -> list[dict[str, Any]]:
     if not query.strip():
         raise ValueError("query must not be empty")
     if limit < 1:
         raise ValueError("limit must be at least 1")
 
-    library = Path(library).resolve()
-    active = library / "active.json"
-    if active.is_file():
-        target = (library / json.loads(active.read_text(encoding="utf-8"))["snapshot"]).resolve()
-        if library not in target.parents:
-            raise ValueError("active snapshot outside library")
-        library = target
+    today = today or date.today()
+    library = _resolve_snapshot(library)
     manifest = _load_manifest(library)
     sheets = manifest.get("sheets", [])
     known_names = {sheet["name"] for sheet in sheets}
@@ -110,6 +155,7 @@ def query_library(
                         "sheet": sheet["name"],
                         "row": row_index,
                         "record": record,
+                        "review_overdue": _review_overdue(record, today),
                     },
                 )
             )
@@ -126,11 +172,33 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--library", type=Path, required=True)
-    parser.add_argument("--query", required=True)
+    parser.add_argument("--query")
     parser.add_argument("--sheet")
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--json", action="store_true")
+    parser.add_argument(
+        "--info", action="store_true", help="print snapshot version, date and sheets, then exit"
+    )
     args = parser.parse_args(argv)
+    try:
+        info = snapshot_info(args.library)
+    except (OSError, ValueError, json.JSONDecodeError, KeyError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    if args.info:
+        print(json.dumps(info, ensure_ascii=False, indent=2))
+        return 0
+    if not args.query:
+        parser.error("--query is required unless --info is given")
+    if info["stale"]:
+        # stderr keeps --json output machine-readable while making staleness
+        # impossible to miss: the agent must say which snapshot date it used.
+        print(
+            f"warning: snapshot {info['version']} captured {info['captured_at']} "
+            f"is {info['age_days']} days old (> {STALE_AFTER_DAYS}); "
+            "update per references/weekly-evolution.md or state the snapshot date in the reply",
+            file=sys.stderr,
+        )
     try:
         results = query_library(
             args.library, args.query, sheet_name=args.sheet, limit=args.limit
@@ -143,7 +211,8 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(results, ensure_ascii=False, indent=2))
     else:
         for result in results:
-            print(f"[{result['sheet']} row {result['row']}]")
+            overdue = " (複查日已過，使用前重查來源)" if result["review_overdue"] else ""
+            print(f"[{result['sheet']} row {result['row']}]{overdue}")
             print(json.dumps(result["record"], ensure_ascii=False, indent=2))
     return 0
 

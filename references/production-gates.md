@@ -70,4 +70,4 @@ Gate 3 通過前不得進入批次或高成本生成。只修失敗鏡頭時，�
 python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 ```
 
-只有 `PROJECT_VALID` 才能繼續。驗證失敗不刪檔、不覆蓋鎖定版本，依診斷回復或阻擋。
+只有 `PROJECT_VALID` 才能繼續。驗證失敗不刪檔、不覆蓋鎖定版本，依診斷回復或阻擋。`PROJECT_VALID` 之前印出的 `WARNING:` 代表狀態檔沒涵蓋到的實際工作（例如生成後未登記、成果放在 `01_inputs`）；回報時逐條說明，並用鎖定、輸出或 `open_decisions` 補記，不可只回報「驗證通過」。

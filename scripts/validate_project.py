@@ -776,16 +776,115 @@ def validate_project(project_dir: Path) -> list[str]:
     return errors
 
 
+# Files written by third-party tools (canvas databases, locks) are not work
+# products and must not trigger the stale-state warning.
+_TOOL_INTERNAL_SUFFIXES = {".sqlite", ".sqlite-shm", ".sqlite-wal", ".lock", ".tmp", ".pyc"}
+_MEDIA_SUFFIXES = _IMAGE_SUFFIXES | _CONSISTENCY_MEDIA_SUFFIXES | {".m4a", ".mp3", ".wav", ".webm", ".mkv"}
+STALE_STATE_SECONDS = 6 * 3600
+
+
+# Bookkeeping files that are appended after the state was last right.
+_STATE_NEUTRAL_FILES = {"knowledge_feedback.jsonl"}
+
+
+def _is_tool_internal(path: Path) -> bool:
+    name = path.name.lower()
+    return name.startswith(".") or name in _STATE_NEUTRAL_FILES or "__pycache__" in path.parts or any(name.endswith(suffix) for suffix in _TOOL_INTERNAL_SUFFIXES)
+
+
+def audit_project(project_dir: Path) -> list[str]:
+    """Return non-blocking warnings about drift between the state file and the work.
+
+    ``validate_project`` proves the recorded evidence is consistent; it cannot see
+    work that was never recorded.  These checks surface that gap so a report
+    never presents an out-of-date PROJECT_STATE.json as the project's status.
+    """
+    project_dir = Path(project_dir)
+    warnings: list[str] = []
+    state_path = project_dir / "PROJECT_STATE.json"
+    if not state_path.is_file():
+        return warnings
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return warnings
+    if not isinstance(state, dict):
+        return warnings
+
+    state_mtime = state_path.stat().st_mtime
+    newer = [
+        path
+        for path in project_dir.rglob("*")
+        if path.is_file()
+        and path != state_path
+        and not _is_tool_internal(path)
+        and path.stat().st_mtime - state_mtime > STALE_STATE_SECONDS
+    ]
+    if newer:
+        newest = max(newer, key=lambda path: path.stat().st_mtime)
+        warnings.append(
+            "PROJECT_STATE.json may be stale: "
+            f"{len(newer)} work file(s) changed more than 6 hours after the state file "
+            f"(newest: {newest.relative_to(project_dir).as_posix()}); "
+            "record the outcome as a locked artifact, output or open decision"
+        )
+
+    inputs_dir = project_dir / "01_inputs"
+    generated_inputs = [
+        path
+        for path in inputs_dir.rglob("*")
+        if path.is_file()
+        and path.suffix.lower() in _MEDIA_SUFFIXES
+        and (
+            "outputs" in {part.lower() for part in path.relative_to(inputs_dir).parts[:-1]}
+            or path.name.lower().startswith("generated")
+        )
+    ] if inputs_dir.is_dir() else []
+    if generated_inputs:
+        warnings.append(
+            f"{len(generated_inputs)} generated media file(s) are stored under 01_inputs "
+            f"(e.g. {generated_inputs[0].relative_to(project_dir).as_posix()}); "
+            "01_inputs is for source material: copy reviewed results into 02_character_and_look "
+            "or 06_generated_assets and register them, or record why they stay"
+        )
+
+    asset_status = state.get("asset_status")
+    outputs = asset_status.get("outputs") if isinstance(asset_status, dict) else None
+    if isinstance(outputs, list) and not (
+        state.get("current_gate") == 4 and state.get("status") == "complete"
+    ):
+        for index, output in enumerate(outputs):
+            if not isinstance(output, dict):
+                continue
+            missing = [field for field in ("path", "version", "sha256", "kind") if field not in output]
+            if missing:
+                warnings.append(
+                    f"asset_status.outputs[{index}] is missing {', '.join(missing)}; "
+                    "this is tolerated before Gate 4 but blocks Gate 4 complete"
+                )
+    return warnings
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project_directory", type=Path)
+    parser.add_argument(
+        "--strict", action="store_true", help="exit 3 when drift warnings exist"
+    )
     args = parser.parse_args(argv)
     errors = validate_project(args.project_directory)
     if errors:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
+    warnings = audit_project(args.project_directory)
+    for warning in warnings:
+        print(f"WARNING: {warning}")
     print("PROJECT_VALID")
+    if warnings:
+        print(f"WARNINGS: {len(warnings)} (report each one; PROJECT_VALID does not cover unrecorded work)")
+        if args.strict:
+            return 3
     return 0
 
 

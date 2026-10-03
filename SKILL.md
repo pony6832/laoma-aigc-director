@@ -68,7 +68,15 @@ python scripts/init_project.py --root "C:\Users\pony6832\Documents\Codex\Codex�
 python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 ```
 
-只有輸出 `PROJECT_VALID` 才可繼續；若失敗，保留既有檔案，依錯誤修正或回到最近的已鎖定版本。
+只有輸出 `PROJECT_VALID` 才可繼續；若失敗，保留既有檔案，依錯誤修正或回到最近的已鎖定版本。驗證器另會印出 `WARNING:`（狀態檔落後於實際工作超過6小時、生成成果放在 `01_inputs`、Gate 4 前的非標準輸出紀錄）；警告不擋流程，但每一條都要在回報中說明，並以鎖定、輸出或 `open_decisions` 把實際工作記回狀態檔。
+
+使用者問案件進度，或開始工作前不確定要接續哪個案件時，先列出全部案件：
+
+```powershell
+python scripts/project_overview.py --root "C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案"
+```
+
+名稱以 `_` 開頭的資料夾（如 `_封存_V1驗收測試`）是封存區，不列入。
 
 初始化器只建立空白案件，並不複製上一版成果。延續案件時先辨識上一版本，使用初始化器配置新版本目錄，再選擇性複製需要保留的產物與本案設定；原始媒體可在 brief 記錄來源位置。更新新版本狀態、重新計算雜湊，僅沿用仍適用且內容未變的核准。不得將新建空白模板描述為已完成的版本遷移。
 
@@ -81,6 +89,8 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 - Gate 3：導演方案鎖定。完成故事／劇本、逐鏡表、視覺分鏡、生成方案、聲音、剪輯與 QC 計畫；通過前不得批次或高成本生成。
 - Gate 4：成片驗收。只有非空輸出檔、匹配雜湊、完成報告、逐項 QC 與使用者核准全部存在時才可完成。
 
+每次實際短測或 Gate 4 QC 有結論（通過、失敗或部分通過都算）時，在該案 `09_reports_and_qc/KNOWLEDGE_FEEDBACK.jsonl` 追加一行回饋，欄位與格式見[品質與復原](references/quality-and-recovery.md)。每週流程會收割這些回饋寫入雲端 `06_實測與失敗`；沒有這一行，實作學到的事就不會回到知識庫。
+
 ## 按需知識路由
 
 - 日常提示詞搭配、新AIGC方法或每週自主學習，優先讀取[每週進化與現行知識庫](references/weekly-evolution.md)，使用V2現行快照；舊提示詞資料庫只供歷史追溯。`主分類=通用指令` 的99項辦公方法已於2026-09-15分流，不得作為導演知識自動載入；只有使用者明確要求辦公方法時，才另行查詢獨立辦公知識庫。
@@ -90,7 +100,7 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 - 要判斷本案該載入哪一段方法時，讀取[知識路由](references/knowledge-routing.md)。
 - 劇本轉鏡頭、分鏡、構圖、運鏡、打光、表演、聲畫或動作設計時，先讀[通用電影鏡頭基礎](references/cinematic-craft-foundation.md)；即使沒有指定導演也要使用，再視需要疊加一份導演風格鏡頭。
 - 要選擇分鏡圖像版型、輸出提案分鏡板或呈現商品廣告逐鏡圖時，讀取[分鏡圖像輸出版型](references/storyboard-output-formats.md)；商品／品牌廣告可選用一頁式分鏡板，鏡數與片長依 brief 決定。
-- 要把參考圖的角度、構圖、電影外觀、燈光、商品廣告、動作、超現實、攝影編輯、幕後製作、場景、類型、渲染或創意特效轉成可組合提示詞時，查詢[視覺提示詞分類](references/visual-prompt-catalog.json)或執行 `scripts/query_visual_prompts.py`；其中斜線詞是平台中立的意圖標記，不是官方命令。Speed Ramp、Jump Cut 等時間語法不可用單張圖宣稱完成，必須以影片序列驗收；品牌或格式名稱只作來源別名，不代表授權或官方模式。
+- 要把參考圖的角度、構圖、電影外觀、燈光、商品廣告、動作、超現實、攝影編輯、幕後製作、場景、類型、渲染或創意特效轉成可組合提示詞時，先查V2現行快照的 `13_視覺提示詞分類`（2026-10-03 為344項）與 `14_視覺風格庫`；本地[視覺提示詞分類](references/visual-prompt-catalog.json)與 `scripts/query_visual_prompts.py` 是2026-09-15的173項結構化子集，只在需要其分類欄位時使用；其中斜線詞是平台中立的意圖標記，不是官方命令。Speed Ramp、Jump Cut 等時間語法不可用單張圖宣稱完成，必須以影片序列驗收；品牌或格式名稱只作來源別名，不代表授權或官方模式。
 - 使用者指定導演、要求可辨識作者風格或要以導演語法審片時，先讀[導演風格鏡頭路由](references/director-style-routing.md)，再從 catalog 一次只載入一個鏡頭；需要查證、擴充或處理衝突時讀[導演知識治理](references/director-knowledge-governance.md)。
 - 執行角色、攝影、Seedance、H3、ComfyUI、聲音或短測時，讀取[版本化知識快照 V1](references/knowledge-snapshot-v1.md)。
 - 需要追溯2026-09-11導入的原始表格時，讀取[老馬提示詞資料庫歷史快照](references/prompt-library/README.md)；一般搭配使用上述V2現行知識庫。

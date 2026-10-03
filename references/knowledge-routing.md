@@ -1,6 +1,6 @@
 # 知識路由
 
-現行提示詞與週更方法優先讀[每週進化](weekly-evolution.md)，查詢references/evolving-library。下文prompt-library為V1歷史來源；「要求更新才重讀」不限制已授權的每週自動更新。
+現行提示詞與週更方法優先讀[每週進化](weekly-evolution.md)，以 `scripts/query_prompt_library.py --library references/evolving-library` 查詢V2現行快照（可見分頁全收，含視覺風格、Google產品、IG社群與電影配樂）。`references/prompt-library` 是2026-09-11的V1歷史快照，只用於追溯原表分頁與列號，不作為日常提示詞來源。
 
 本 Skill 已把 V1 所需方法固定在本套件的[版本化知識快照 V1](knowledge-snapshot-v1.md)，執行時不依賴 `ai-video-learning-mentor` 資料夾。只載入當前案件需要的快照片段，避免無關方法污染決策。
 
@@ -16,7 +16,9 @@
 | Seedance 生成或診斷 | 「Seedance 路由」 | 鎖定角色／場景、逐鏡設計、實際入口 | 單鏡提示、共用鎖定詞、入口與 QC 記錄 |
 | MiniMax H3 生成或診斷 | 「MiniMax H3 路由」 | 各參考素材唯一職責、實際 H3 入口 | 全模態提示、禁用轉移、時間與聲畫驗收 |
 | ComfyUI 節點工作流 | 「ComfyUI 路由」 | ComfyUI／節點／模型版本與資料邊界 | 可重現工作流規格、依賴與錯誤證據 |
-| 圖像生成、照片修復、長版圖像案例、運鏡、影片燈光或角色設計板 | [老馬提示詞資料庫快照](prompt-library/README.md) | 本次需求、案件鎖定事實與需保留／禁止項目 | 可追溯至分頁與列號的少量影像提示元件，再組裝成本案提示；排除辦公通用指令 |
+| 圖像生成、照片修復、長版圖像案例、運鏡、影片燈光、視覺風格或角色設計板 | [每週進化](weekly-evolution.md)的V2現行快照（`02_提示詞總庫`、`13_視覺提示詞分類`、`14_視覺風格庫`）；需追溯舊表原列時才查[V1歷史快照](prompt-library/README.md) | 本次需求、案件鎖定事實與需保留／禁止項目 | 附知識ID的少量影像提示元件，再組裝成本案提示；排除辦公通用指令 |
+| 電影配樂、AI音樂、spotting或cue設計 | V2現行快照 `22_電影配樂與AI音樂`，並讀快照「聲音與後製」 | 劇本節拍、情緒曲線、對白位置、授權與商用限制 | spotting表、cue規格、音樂生成提示與驗收 |
+| Google Flow／Veo／Gemini影像入口 | V2現行快照 `17_Google影像影片產品`；`review_overdue` 為真時先重查官方文件 | 實際入口、帳號方案、素材與輸出規格 | 入口選擇、提示方法與限制 |
 | 旁白、音樂、音效、混音、剪輯或交付 | 「聲音與後製」 | 劇本節拍、實際素材與授權 | 聲音表、後製順序、同步與交付 QC |
 | 漂移、動作、物理、聲音或上下文失敗 | 「4–6 秒短測與 QC」及[品質與復原](quality-and-recovery.md) | 最近鎖定版本、失敗輸出與錯誤紀錄 | 單一變數重試、新版本與回退點 |
 
@@ -26,4 +28,4 @@
 2. Seedance、H3 與 ComfyUI 是不同路由。ComfyUI 節點可能是 Core、Partner/API、第三方 custom node 或本機模型；節點存在不等於模型在本機執行。
 3. 快照中的產品能力只是帶日期的規劃依據。凡是「目前／最新／支援／價格／額度／地區／API」都以當前官方來源與實際入口重查。
 4. 同一案件跨專科時，只以 `PROJECT_STATE.json` 與鎖定檔案交接；不要從舊聊天或舊案例補人物、故事或參數。
-5. 提示詞資料庫是 2026-09-11 的本地快照。平常以 `scripts/query_prompt_library.py` 按分頁與關鍵詞查詢；只有使用者要求更新或最新資料時才重讀原試算表。
+5. 提示詞資料庫以 `references/evolving-library/active.json` 指定的V2快照為準，先用 `--info` 看擷取日。查詢器顯示快照超過8天或 `review_overdue` 時，依[每週進化](weekly-evolution.md)更新或在回覆中說明使用哪天的資料；使用者要求最新資料時也先更新。

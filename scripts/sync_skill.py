@@ -66,14 +66,27 @@ def _paths_overlap(first: Path, second: Path) -> bool:
     return first == second or first in second.parents or second in first.parents
 
 
-def sync_skill(source: Path, destination_root: Path, replace: bool = False) -> Path:
+def sync_skill(
+    source: Path,
+    destination_root: Path,
+    replace: bool = False,
+    backup_root: Path | None = None,
+) -> Path:
     """Install a staged, hash-manifested runtime copy and return its directory.
 
     Existing installs are never overwritten implicitly.  Replacement preserves the
-    existing directory as a timestamped sibling backup before promoting staging.
+    existing directory as a timestamped backup before promoting staging.  Backups
+    go to ``backup_root`` (default: ``<destination_root>/../skill-backups``), never
+    into the skills directory itself: agents scan that directory for SKILL.md and
+    would load every backup as a duplicate skill.
     """
     source = Path(source).expanduser().resolve()
     destination_root = Path(destination_root).expanduser().resolve()
+    backup_root = (
+        Path(backup_root).expanduser().resolve()
+        if backup_root is not None
+        else destination_root.parent / "skill-backups"
+    )
     destination = destination_root / SKILL_NAME
     staging = destination_root / f".{SKILL_NAME}.staging"
 
@@ -101,7 +114,8 @@ def sync_skill(source: Path, destination_root: Path, replace: bool = False) -> P
 
         if destination.exists():
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            backup = destination_root / f"{SKILL_NAME}.backup-{timestamp}"
+            backup_root.mkdir(parents=True, exist_ok=True)
+            backup = backup_root / f"{SKILL_NAME}.backup-{timestamp}"
             if backup.exists():
                 raise FileExistsError(f"backup destination already exists: {backup}")
             destination.rename(backup)
@@ -134,9 +148,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--destination-root", type=Path, required=True)
     parser.add_argument("--replace", action="store_true")
+    parser.add_argument(
+        "--backup-root",
+        type=Path,
+        help="where replaced installs are kept (default: <destination-root>/../skill-backups)",
+    )
     args = parser.parse_args(argv)
     try:
-        print(sync_skill(args.source, args.destination_root, replace=args.replace))
+        print(
+            sync_skill(
+                args.source,
+                args.destination_root,
+                replace=args.replace,
+                backup_root=args.backup_root,
+            )
+        )
     except (OSError, RuntimeError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

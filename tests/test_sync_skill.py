@@ -44,9 +44,12 @@ class SyncSkillTests(unittest.TestCase):
             first = sync_skill(source, root)
             (first / "preserve-me.txt").write_text("old install", encoding="utf-8")
 
-            installed = sync_skill(source, root, replace=True)
+            backup_root = root / "backups"
+            installed = sync_skill(source, root, replace=True, backup_root=backup_root)
 
-            backups = list(root.glob("laoma-aigc-director.backup-????????-??????"))
+            self.assertEqual(list(root.glob("laoma-aigc-director.backup-*")), [],
+                             "backups must not land in the skills directory")
+            backups = list(backup_root.glob("laoma-aigc-director.backup-????????-??????"))
             self.assertEqual(len(backups), 1)
             self.assertEqual((backups[0] / "preserve-me.txt").read_text(encoding="utf-8"), "old install")
             self.assertFalse((installed / "preserve-me.txt").exists())
@@ -67,7 +70,7 @@ class SyncSkillTests(unittest.TestCase):
                     skill_file.write_text(name, encoding="utf-8")
 
                     with self.assertRaisesRegex(ValueError, "overlap"):
-                        sync_skill(source, destination_root, replace=True)
+                        sync_skill(source, destination_root, replace=True, backup_root=Path(tmp) / "backups")
 
                     self.assertEqual(skill_file.read_text(encoding="utf-8"), name)
                     self.assertFalse((destination_root / f".{SKILL_NAME}.staging").exists())
@@ -105,11 +108,12 @@ class SyncSkillTests(unittest.TestCase):
                 "scripts.sync_skill._copy_runtime_entry",
                 side_effect=OSError("injected copy failure"),
             ), self.assertRaisesRegex(OSError, "injected copy failure"):
-                sync_skill(source, root, replace=True)
+                sync_skill(source, root, replace=True, backup_root=root / "backups")
 
             self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
             self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
             self.assertEqual(list(root.glob(f"{SKILL_NAME}.backup-*")), [])
+            self.assertEqual(list((root / "backups").glob(f"{SKILL_NAME}.backup-*")), [])
 
     def test_manifest_failure_cleans_current_staging_and_preserves_install(self):
         source = Path(__file__).resolve().parents[1]
@@ -123,11 +127,12 @@ class SyncSkillTests(unittest.TestCase):
                 "scripts.sync_skill._write_manifest",
                 side_effect=OSError("injected manifest failure"),
             ), self.assertRaisesRegex(OSError, "injected manifest failure"):
-                sync_skill(source, root, replace=True)
+                sync_skill(source, root, replace=True, backup_root=root / "backups")
 
             self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
             self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
             self.assertEqual(list(root.glob(f"{SKILL_NAME}.backup-*")), [])
+            self.assertEqual(list((root / "backups").glob(f"{SKILL_NAME}.backup-*")), [])
 
     def test_promotion_failure_restores_prior_install_and_cleans_staging(self):
         source = Path(__file__).resolve().parents[1]
@@ -147,11 +152,12 @@ class SyncSkillTests(unittest.TestCase):
             with patch.object(
                 Path, "rename", autospec=True, side_effect=fail_staging_promotion
             ), self.assertRaisesRegex(OSError, "injected promotion failure"):
-                sync_skill(source, root, replace=True)
+                sync_skill(source, root, replace=True, backup_root=root / "backups")
 
             self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
             self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
             self.assertEqual(list(root.glob(f"{SKILL_NAME}.backup-*")), [])
+            self.assertEqual(list((root / "backups").glob(f"{SKILL_NAME}.backup-*")), [])
 
     def test_promotion_failure_without_prior_install_cleans_staging(self):
         source = Path(__file__).resolve().parents[1]
@@ -181,7 +187,7 @@ class SyncSkillTests(unittest.TestCase):
             skill_file.write_text("source inside staging", encoding="utf-8")
 
             with self.assertRaisesRegex(ValueError, "overlap"):
-                sync_skill(source, destination_root, replace=True)
+                sync_skill(source, destination_root, replace=True, backup_root=Path(tmp) / "backups")
 
             self.assertEqual(
                 skill_file.read_text(encoding="utf-8"), "source inside staging"

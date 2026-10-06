@@ -149,4 +149,4 @@ python scripts/sync_skill.py --source . --destination-root "C:\Users\pony6832\.c
 python scripts/sync_skill.py --source . --destination-root "C:\Users\pony6832\.codex\skills" --replace
 ```
 
-本次執行在複製、manifest 或推進失敗時會清除自己建立的 staging；若既有安裝已改名而新版本推進失敗，會先把備份還原成正式安裝。成功替換後則永久保留時間戳備份，不自動刪除。
+本次執行在複製、manifest 或推進失敗時會清除自己建立的 staging；若既有安裝已改名而新版本推進失敗，會先把備份還原成正式安裝。成功替換後則永久保留時間戳備份，不自動刪除。備份預設放在 `<destination-root>` 的上一層 `skill-backups/`（例如 `C:\Users\pony6832\.codex\skill-backups`），可用 `--backup-root` 指定；不可放回 skills 目錄，否則 Codex／Claude 掃描 SKILL.md 時會把每份備份當成同名技能重複載入。

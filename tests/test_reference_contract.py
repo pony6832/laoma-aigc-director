@@ -17,6 +17,7 @@ REFERENCE_FILES = (
     "director-knowledge-governance.md",
     "cinematic-craft-foundation.md",
     "storyboard-output-formats.md",
+    "prompt-preflight-checklist.md",
 )
 
 

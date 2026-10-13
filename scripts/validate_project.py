@@ -306,7 +306,10 @@ def _validate_check_items(checks: object, errors: list[str]) -> None:
             continue
         for field in ("name", "status", "evidence"):
             if field not in check:
-                errors.append(f"missing {label} field: {field}")
+                errors.append(
+                    f"missing {label} field: {field} "
+                    "(expected {name, status, evidence})"
+                )
         if "name" in check and not _is_nonempty_string(check["name"]):
             errors.append(f"invalid {label}.name: expected non-empty string")
         if "status" in check and (
@@ -364,7 +367,10 @@ def _validate_asset_status_shape(asset_status: dict, errors: list[str]) -> None:
             not isinstance(approval["status"], str)
             or approval["status"] not in {"not_requested", "pending", "approved", "rejected"}
         ):
-            errors.append("invalid asset_status.approval.status")
+            errors.append(
+                "invalid asset_status.approval.status: expected one of "
+                "not_requested, pending, approved, rejected"
+            )
         if "approved_at" in approval and approval["approved_at"] is not None and not _is_timezone_aware_iso8601(approval["approved_at"]):
             errors.append(
                 "invalid asset_status.approval.approved_at: expected null or timezone-aware ISO 8601"
@@ -623,7 +629,10 @@ def _validate_gate_four_completion(
 ) -> None:
     _require_locked_roles("Gate 4 complete", roles, ("generation_report",), errors)
     if state["open_decisions"]:
-        errors.append("Gate 4 complete requires open_decisions to be empty")
+        errors.append(
+            "Gate 4 complete requires open_decisions to be empty "
+            "(resolved entries block too; move them to a versioned report)"
+        )
 
     asset_status = state["asset_status"]
     if asset_status.get("claimed_complete_without_output") is not False:
@@ -757,7 +766,7 @@ def validate_project(project_dir: Path) -> list[str]:
         if profile_path.is_file():
             profile = _load_json(profile_path, "CHARACTER_PROFILE.json", errors)
             if profile is not None and profile.get("status") != "approved":
-                errors.append("Gate 2 approval requires approved CHARACTER_PROFILE.json")
+                errors.append("Gate 2 approval requires CHARACTER_PROFILE.json status='approved'")
         _require_locked_roles(
             "Gate 2 approval", roles, GATE_TWO_LOCK_ROLES, errors
         )

@@ -26,7 +26,7 @@ Gate 1–3 不可使用 `complete`；Gate 4 不使用 `approved`，因為實體�
 
 - 輸入：已鎖定 brief、角色／產品參考與視覺方向。
 - 最低產物：
-  - 核准的 `CHARACTER_PROFILE.json`。
+  - 核准的 `CHARACTER_PROFILE.json`：頂層 `status` 必須是字面值 `"approved"`（範本預設 `"draft"`；`locked` 等其他字都會被驗證器拒絕）。
   - `PRODUCTION_BIBLE.md`。
   - `02_character_and_look/` 內一張非空、可辨識的角色總覽圖，角色、服裝、道具與外觀錨點清楚。
   - `02_character_and_look/` 內一張非空、可辨識的無角色場景參考圖，只鎖定空間、光線、材質、色彩與環境狀態。
@@ -62,8 +62,8 @@ Gate 3 核准的是方案，不代表每一次送出時的設定都正確。每�
   - `06_generated_assets/` 內至少一個實際存在且非空的輸出檔。
   - `asset_status.outputs` 中每個輸出的安全相對路徑、版本、種類與匹配 SHA-256；正規化後必須仍位於 `06_generated_assets/`，不可用絕對路徑或 `..` 逃逸。
   - 已填寫且不等於原始空白模板的 `GENERATION_REPORT.md`，並以 `generation_report` 角色鎖定。
-  - `asset_status.qc` 中非空檢查清單；每項為 `passed` 且有證據、檢查者與含時區時間。
-  - `asset_status.approval` 中使用者核准者、含時區時間與非空核准範圍。
+  - `asset_status.qc` 中非空檢查清單；每項為 `passed` 且有證據、檢查者與含時區時間。清單除了規格、響度與剪接點，還要有臉部 100% 裁切（膚質）、手與肢體、逐鏡時間穩定性與 ASR 關鍵字檢查，做法見[版本化知識快照 V1](knowledge-snapshot-v1.md)「後製與交付順序」。
+  - `asset_status.approval` 中使用者核准者、含時區時間與非空核准範圍；`status` 只接受 `not_requested`、`pending`、`approved`、`rejected`（等待使用者核准寫 `pending`），Gate 4 `complete` 必須是 `approved`。
   - `claimed_complete_without_output=false`，且沒有未決 `open_decisions`。
 - 通過條件：輸出檔、雜湊、報告、QC 與核准全部通過 `scripts/validate_project.py`。
 - 停止條件：缺少實體輸出、雜湊不符、任何 QC 未通過、輸出規格不符、權利阻擋或核准被撤回。

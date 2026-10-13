@@ -31,6 +31,7 @@ TEMPLATE_TARGETS = {
 }
 
 _WINDOWS_FORBIDDEN = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+_VERSION_SUFFIX = re.compile(r"_[Vv]\d+$")
 _WINDOWS_RESERVED = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
 
 
@@ -43,6 +44,11 @@ def _validate_project_name(project_name: str) -> None:
         raise ValueError("project_name contains invalid trailing characters")
     if project_name.split(".", 1)[0].upper() in _WINDOWS_RESERVED:
         raise ValueError("project_name uses a reserved Windows device name")
+    if _VERSION_SUFFIX.search(project_name):
+        raise ValueError(
+            "project_name must not end with a version suffix such as _V01; "
+            "pass the bare name and the initializer appends the version"
+        )
 
 
 def create_project(projects_root: Path, project_name: str) -> Path:

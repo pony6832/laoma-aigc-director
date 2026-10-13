@@ -81,7 +81,7 @@
 }
 ```
 
-`status` 只用 `open` 或 `resolved`。完成案件不得仍有未決項；需要保留歷史時把已解決紀錄移入版本化報告，不建立第二個狀態陣列。
+`status` 只用 `open` 或 `resolved`。Gate 4 `complete` 要求陣列完全清空，標成 `resolved` 的項目也會擋下；需要保留歷史時把已解決紀錄移入版本化報告，不建立第二個狀態陣列。
 
 ## asset_status
 
@@ -120,9 +120,9 @@
 ```
 
 - `outputs` 的路徑正規化後必須仍指向 `06_generated_assets/` 內非空檔案並重算匹配 SHA-256；拒絕絕對路徑與 `..` 逃逸。
-- QC `status` 可為 `not_started|pending|passed|failed`；每項 check 為 `pending|passed|failed`。
+- QC `status` 可為 `not_started|pending|passed|failed`；每項 check 的鍵固定為 `name`、`status`、`evidence`（寫成 `item`、`result` 會被拒絕），`status` 為 `pending|passed|failed`。
 - approval `status` 可為 `not_requested|pending|approved|rejected`。
-- 核准 `scope` 應列出本次 `outputs` 的案件相對路徑；為相容既有案件，也接受能唯一識別輸出的檔名。每一項須對應實際輸出，且覆蓋全部輸出；同名輸出請使用完整相對路徑消除歧義。
+- 核准 `scope` 每一項只能是路徑字串本身，不可加說明文字（「最終版 06_generated_assets/final_v01.mp4」會被拒絕）；應列出本次 `outputs` 的案件相對路徑；為相容既有案件，也接受能唯一識別輸出的檔名。每一項須對應實際輸出，且覆蓋全部輸出；同名輸出請使用完整相對路徑消除歧義。
 - Gate 4 `complete` 只接受 QC 全部通過、核准完成、有非空 scope、無未決項及 `claimed_complete_without_output=false`。
 
 ## Gate 更新順序

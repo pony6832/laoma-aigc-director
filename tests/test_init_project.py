@@ -79,6 +79,7 @@ class InitProjectTests(unittest.TestCase):
                 *(f"bad{character}name" for character in '<>:"/\\|?*'),
                 "bad\x00name", "bad\x01name", "bad\x1fname",
                 "bad.", "bad ", "CON", "PRN.txt", "AUX", "NUL", "COM1", "LPT9",
+                "台北孤城_V01", "case_v2",
             )
             for name in invalid_names:
                 with self.subTest(name=name), self.assertRaisesRegex(ValueError, "project_name"):

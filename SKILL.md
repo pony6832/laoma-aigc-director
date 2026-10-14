@@ -108,6 +108,7 @@ python scripts/project_overview.py --root "C:\Users\pony6832\Documents\Codex\Cod
 - 要把參考圖的角度、構圖、電影外觀、燈光、商品廣告、動作、超現實、攝影編輯、幕後製作、場景、類型、渲染或創意特效轉成可組合提示詞時，先查V2現行快照的 `13_視覺提示詞分類`（2026-10-03 為344項）與 `14_視覺風格庫`；本地[視覺提示詞分類](references/visual-prompt-catalog.json)與 `scripts/query_visual_prompts.py` 是2026-09-15的173項結構化子集，只在需要其分類欄位時使用；其中斜線詞是平台中立的意圖標記，不是官方命令。Speed Ramp、Jump Cut 等時間語法不可用單張圖宣稱完成，必須以影片序列驗收；品牌或格式名稱只作來源別名，不代表授權或官方模式。
 - 使用者指定導演、要求可辨識作者風格或要以導演語法審片時，先讀[導演風格鏡頭路由](references/director-style-routing.md)，再從 catalog 一次只載入一個鏡頭；需要查證、擴充或處理衝突時讀[導演知識治理](references/director-knowledge-governance.md)。
 - 執行角色、關鍵幀、攝影、Seedance、H3、ComfyUI、聲音或短測時，讀取[版本化知識快照 V1](references/knowledge-snapshot-v1.md)。撰寫 MiniMax H3 提示詞時，若環境有 `h3-prompt-writing` 技能，再載入它的模式結構（T2VA／I2VA／FL2VA／L2VA／Ref2VA）；本案鎖定條件仍以本技能為準。
+- 多鏡頭或角色重複出現的案子要建立錨點卡、驗收首／中／尾幀身分，或在本機 ComfyUI 跑 H3 等影片模型時要拆鏡頭、接段、處理顯存不足時，讀取[地端 H3 製作手冊](references/local-h3-runbook.md)。
 - 需要追溯2026-09-11導入的原始表格時，讀取[老馬提示詞資料庫歷史快照](references/prompt-library/README.md)；一般搭配使用上述V2現行知識庫。
 - 要建立案件狀態、版本或鎖定交付物時，讀取[案件狀態與版本](references/project-state-and-versioning.md)。
 - 發生品質問題、需要縮減重試，或付費任務失敗、考慮重新生成時，讀取[品質與復原](references/quality-and-recovery.md)；每次付費生成送出前的確認見[製作 Gate](references/production-gates.md)。

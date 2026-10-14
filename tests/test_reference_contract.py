@@ -18,6 +18,7 @@ REFERENCE_FILES = (
     "cinematic-craft-foundation.md",
     "storyboard-output-formats.md",
     "prompt-preflight-checklist.md",
+    "local-h3-runbook.md",
 )
 
 

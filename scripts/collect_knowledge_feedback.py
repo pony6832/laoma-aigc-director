@@ -26,6 +26,20 @@ REQUIRED = ("回饋ID", "來源案件", "平台", "假說", "驗收條件", "輸
 RESULTS = {"實測通過", "實測失敗", "部分通過"}
 
 
+def feedback_paths(root: Path):
+    """Accept a project root or the archive's type/project hierarchy."""
+    root = Path(root)
+    for pattern in ("*/09_reports_and_qc/KNOWLEDGE_FEEDBACK.jsonl",
+                    "*/09_報告與QC/KNOWLEDGE_FEEDBACK.jsonl",
+                    "*/*/09_reports_and_qc/KNOWLEDGE_FEEDBACK.jsonl",
+                    "*/*/09_報告與QC/KNOWLEDGE_FEEDBACK.jsonl"):
+        for path in sorted(root.glob(pattern)):
+            if path.is_file() and not any(
+                part.startswith(("_", ".")) for part in path.relative_to(root).parts[:-1]
+            ):
+                yield path
+
+
 def _read(path: Path) -> list[dict]:
     entries = []
     for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
@@ -43,12 +57,10 @@ def _read(path: Path) -> list[dict]:
 
 def collect(root: Path, include_synced: bool = False) -> list[dict]:
     found = []
-    for project in sorted(Path(root).iterdir()):
-        path = project / FEEDBACK_FILE
-        if project.is_dir() and not project.name.startswith("_") and path.is_file():
-            for entry in _read(path):
-                if include_synced or not entry.get("已同步"):
-                    found.append(entry)
+    for path in feedback_paths(root):
+        for entry in _read(path):
+            if include_synced or not entry.get("已同步"):
+                found.append(entry)
     ids = [entry["回饋ID"] for entry in found]
     if len(ids) != len(set(ids)):
         raise ValueError("duplicate 回饋ID across projects")
@@ -57,11 +69,10 @@ def collect(root: Path, include_synced: bool = False) -> list[dict]:
 
 def mark_synced(root: Path, feedback_ids: set[str], synced_at: str) -> int:
     marked = 0
-    for project in sorted(Path(root).iterdir()):
-        path = project / FEEDBACK_FILE
-        if not (project.is_dir() and path.is_file()):
-            continue
-        entries = _read(path)
+    # Validate all inputs before any write, so malformed later files cannot
+    # leave an earlier subset marked.
+    records = [(path, _read(path)) for path in feedback_paths(root)]
+    for path, entries in records:
         changed = False
         for entry in entries:
             if entry["回饋ID"] in feedback_ids and not entry.get("已同步"):

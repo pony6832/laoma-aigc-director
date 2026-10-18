@@ -46,7 +46,7 @@ def publish(payload, library, version):
             raise ValueError("unknown source id")
         if record["生命週期"] not in {"可參考", "待查證", "停用"}:
             raise ValueError("invalid lifecycle")
-        if record["實測狀態"] not in {"未實測", "實測通過", "實測失敗"}:
+        if record["實測狀態"] not in {"未實測", "實測通過", "實測失敗", "部分通過"}:
             raise ValueError("invalid test status")
         if record["主分類"] == "通用指令":
             raise ValueError("office general command is not allowed in director snapshot")

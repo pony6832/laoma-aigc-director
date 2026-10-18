@@ -34,7 +34,7 @@ python scripts/query_prompt_library.py --library references/evolving-library --s
 
 ### 受管理分頁
 
-受管理分頁＝個人主表中所有**可見**分頁，以每次讀到的 metadata 為準，不寫死數量（2026-10-03 為 00–14、17、19、22 共18頁）。隱藏的「來源對照」與「封存_」分頁只留在雲端做溯源，不進本機快照。新增可見分頁時，本機快照會自動帶入，不需改程式。
+受管理分頁＝個人主表中所有**可見**分頁，以每次讀到的 metadata 為準，不寫死數量（2026-10-18 為 00–14、17、19、22、24 共19頁）。隱藏的「來源對照」與「封存_」分頁只留在雲端做溯源，不進本機快照。新增可見分頁時，本機快照會自動帶入，不需改程式。
 
 ### 流程與階段紀錄
 
@@ -49,7 +49,7 @@ python scripts/query_prompt_library.py --library references/evolving-library --s
    - 去重鍵採正規化名稱／別名＋平台＋模式＋用途。知識ID永久不重用；同概念補別名或升版本，舊內容與差異進08。來源、狀態、版本欄不得空白。與人工改動衝突先保留兩版並記07。新內容禁止 `主分類=通用指令`；辦公候選寫入獨立辦公知識庫的 `03_新增待整理`。
    - 遵守現有原生表格、欄位與下拉選項，必要時擴大grid和table range；同步更新00、01、05、07、08。完整回讀比較，記錄新增／修改／停用ID。來源支持不等於實測成功；無預算授權時只生成測試計畫，不觸發付費生成。
 2. **B 公司副本同步**：依「唯一現行雲端來源」的規則同步並逐分頁核對值一致。
-3. **C 實測回饋收割**：執行 `python scripts/collect_knowledge_feedback.py --root "C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案"`，把未同步的案件實測（通過與失敗都要）寫入 `06_實測與失敗`，指派新的測試ID，並在02相關條目更新實測狀態。回讀確認後才執行 `--mark-synced <回饋ID…>`。沒有新回饋時記「略過：無新回饋」。
+3. **C 實測回饋收割**：先讀根目錄 README；收集器掃描類型／案件兩層並兼容 `09_reports_and_qc` 與 `09_報告與QC`，不掃封存目錄。舊格式回饋先備份、依原QC轉成必填中文欄位，不能把整案 passed 推定為所有子測試通過。執行 `python scripts/collect_knowledge_feedback.py --root "D:\【AIGC-ALL】\【AIGC】"`，把未同步的案件實測（通過與失敗都要）寫入 `06_實測與失敗`，指派新的測試ID，並在02相關條目更新實測狀態。回讀確認後才執行 `--mark-synced <回饋ID…>`。沒有新回饋時記「略過：無新回饋」。
 4. **D 本機快照**：把個人主表以 .xlsx 匯出到本機（Drive 匯出，mimeType `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`），再執行：
    ```powershell
    python scripts/export_xlsx_snapshot.py --xlsx <主表.xlsx> --output <payload.json> --captured-at YYYY-MM-DD

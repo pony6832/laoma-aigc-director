@@ -29,10 +29,8 @@ class SkillContractTests(unittest.TestCase):
         text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("scripts/init_project.py", text)
         self.assertIn("scripts/validate_project.py", text)
-        self.assertIn(
-            r"C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案",
-            text,
-        )
+        # Storage routing is exercised by the skill reference scenario;
+        # do not pin a retired machine-specific directory here.
         for template in (
             "project-brief-template.md",
             "production-bible-template.md",

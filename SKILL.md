@@ -34,19 +34,19 @@ description: Use when the user requests AIGC film production, character or visua
 
 ## 可執行案件流程
 
-案件預設根目錄固定為：
+開案前完整讀取 `D:\【AIGC-ALL】\【AIGC】\README.md`，按主要交付物選類型目錄作為 `--root`；影片案範例：
 
-`C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案`
+`D:\【AIGC-ALL】\【AIGC】\05_影片_Video`
 
 使用者明確指定其他根目錄時，以該路徑傳入 `--root`。PowerShell 執行 Python 前設定 `$env:PYTHONUTF8='1'`，避免中文路徑與輸出受系統編碼影響。
 
 從 Skill 目錄執行；建立新案時使用初始化器，絕不手動重用已存在的版本目錄：
 
 ```powershell
-python scripts/init_project.py --root "C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案" --name "<PROJECT_NAME>"
+python scripts/init_project.py --root "D:\【AIGC-ALL】\【AIGC】\05_影片_Video" --name "<PROJECT_NAME>"
 ```
 
-`--name` 只填不含版本的案名，初始化器會自己加上 `_V01`（或下一個可用版本）；照舊資料夾名稱寫成 `…_V01` 會變成 `…_V01_V01`。建立後，在給使用者的第一則進度訊息就寫出案件的絕對路徑；從其他工作區驅動製作時，在那個工作區的作品資料夾留一個指向案件的說明檔。
+`--name` 填 `YYYYMMDD_中文案名_英數字補充`，只填不含版本的案名，初始化器會自己加上 `_V01`（或下一個可用版本）；照舊資料夾名稱寫成 `…_V01` 會變成 `…_V01_V01`。建立後，在給使用者的第一則進度訊息就寫出案件的絕對路徑；從其他工作區驅動製作時，在那個工作區的作品資料夾留一個指向案件的說明檔。
 
 初始化器會把下列模板複製到新案：
 
@@ -77,8 +77,10 @@ python scripts/validate_project.py "<ABSOLUTE_PROJECT_DIRECTORY>"
 使用者問案件進度，或開始工作前不確定要接續哪個案件時，先列出全部案件：
 
 ```powershell
-python scripts/project_overview.py --root "C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\老馬AIGC導演專案"
+python scripts/project_overview.py --root "D:\【AIGC-ALL】\【AIGC】\05_影片_Video"
 ```
+
+上述總覽命令一次查一個類型；其他類型按根 README 逐一查詢。開案、交付或搬動後執行 `python "D:\【AIGC-ALL】\【AIGC】\更新總索引.py"`。舊案件內部路徑保持原樣，不批量搬改已鎖定檔案。
 
 名稱以 `_` 開頭的資料夾（如 `_封存_V1驗收測試`）是封存區，不列入。
 

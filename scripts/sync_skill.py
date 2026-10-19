@@ -61,6 +61,25 @@ def _write_manifest(staging: Path) -> None:
     )
 
 
+def _files_dropped_by_replace(installed: Path, staging: Path) -> list[str]:
+    """Return installed files the replacement would not carry forward.
+
+    These are files written into the live install after it was synced (for
+    example a weekly knowledge snapshot) that the source never had.  The
+    install's own generated manifest is excluded.
+    """
+    def relative_files(root: Path) -> set[str]:
+        return {
+            path.relative_to(root).as_posix()
+            for path in root.rglob("*")
+            if path.is_file()
+        }
+
+    dropped = relative_files(installed) - relative_files(staging)
+    dropped.discard(".source-manifest.json")
+    return sorted(dropped)
+
+
 def _paths_overlap(first: Path, second: Path) -> bool:
     """Return whether either resolved path contains the other."""
     return first == second or first in second.parents or second in first.parents
@@ -71,6 +90,7 @@ def sync_skill(
     destination_root: Path,
     replace: bool = False,
     backup_root: Path | None = None,
+    force_drop: bool = False,
 ) -> Path:
     """Install a staged, hash-manifested runtime copy and return its directory.
 
@@ -79,6 +99,11 @@ def sync_skill(
     go to ``backup_root`` (default: ``<destination_root>/../skill-backups``), never
     into the skills directory itself: agents scan that directory for SKILL.md and
     would load every backup as a duplicate skill.
+
+    Replacement refuses when the existing install holds files the source lacks
+    (they would silently disappear from the live skill) unless ``force_drop`` is
+    set; commit those files to the source first, or pass ``force_drop`` after
+    checking that losing them is intended.  The backup still keeps them.
     """
     source = Path(source).expanduser().resolve()
     destination_root = Path(destination_root).expanduser().resolve()
@@ -111,6 +136,17 @@ def sync_skill(
         for entry in RUNTIME_ENTRIES:
             _copy_runtime_entry(source, staging, entry)
         _write_manifest(staging)
+
+        if destination.exists() and not force_drop:
+            dropped = _files_dropped_by_replace(destination, staging)
+            if dropped:
+                shown = "\n  ".join(dropped[:20])
+                more = f"\n  ... and {len(dropped) - 20} more" if len(dropped) > 20 else ""
+                raise FileExistsError(
+                    f"replace would drop {len(dropped)} file(s) that exist only in the "
+                    f"installed copy:\n  {shown}{more}\n"
+                    "commit them to the source first, or rerun with --force-drop"
+                )
 
         if destination.exists():
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -153,6 +189,11 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         help="where replaced installs are kept (default: <destination-root>/../skill-backups)",
     )
+    parser.add_argument(
+        "--force-drop",
+        action="store_true",
+        help="allow --replace to drop files that exist only in the installed copy",
+    )
     args = parser.parse_args(argv)
     try:
         print(
@@ -161,6 +202,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.destination_root,
                 replace=args.replace,
                 backup_root=args.backup_root,
+                force_drop=args.force_drop,
             )
         )
     except (OSError, RuntimeError, ValueError) as exc:

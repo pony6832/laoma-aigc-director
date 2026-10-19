@@ -45,7 +45,9 @@ class SyncSkillTests(unittest.TestCase):
             (first / "preserve-me.txt").write_text("old install", encoding="utf-8")
 
             backup_root = root / "backups"
-            installed = sync_skill(source, root, replace=True, backup_root=backup_root)
+            installed = sync_skill(
+                source, root, replace=True, backup_root=backup_root, force_drop=True
+            )
 
             self.assertEqual(list(root.glob("laoma-aigc-director.backup-*")), [],
                              "backups must not land in the skills directory")
@@ -53,6 +55,31 @@ class SyncSkillTests(unittest.TestCase):
             self.assertEqual(len(backups), 1)
             self.assertEqual((backups[0] / "preserve-me.txt").read_text(encoding="utf-8"), "old install")
             self.assertFalse((installed / "preserve-me.txt").exists())
+
+    def test_replace_refuses_to_drop_live_only_files_and_leaves_install_untouched(self):
+        source = Path(__file__).resolve().parents[1]
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            first = sync_skill(source, root)
+            snapshot = first / "references" / "evolving-library" / "2099-01-01-r1" / "data.json"
+            snapshot.parent.mkdir(parents=True)
+            snapshot.write_text("{}", encoding="utf-8")
+
+            backup_root = root / "backups"
+            with self.assertRaisesRegex(FileExistsError, "2099-01-01-r1/data.json"):
+                sync_skill(source, root, replace=True, backup_root=backup_root)
+
+            self.assertTrue(snapshot.is_file(), "live-only snapshot must survive a refused replace")
+            self.assertFalse((root / f".{SKILL_NAME}.staging").exists())
+            self.assertFalse(backup_root.exists() and any(backup_root.iterdir()))
+
+    def test_replace_without_live_only_files_needs_no_force_drop(self):
+        source = Path(__file__).resolve().parents[1]
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sync_skill(source, root)
+            installed = sync_skill(source, root, replace=True, backup_root=root / "backups")
+            self.assertTrue((installed / "SKILL.md").is_file())
 
     def test_rejects_source_and_install_path_overlap_without_mutating_source(self):
         for name in ("same", "destination_descendant", "source_descendant"):
@@ -152,7 +179,9 @@ class SyncSkillTests(unittest.TestCase):
             with patch.object(
                 Path, "rename", autospec=True, side_effect=fail_staging_promotion
             ), self.assertRaisesRegex(OSError, "injected promotion failure"):
-                sync_skill(source, root, replace=True, backup_root=root / "backups")
+                sync_skill(
+                    source, root, replace=True, backup_root=root / "backups", force_drop=True
+                )
 
             self.assertEqual(marker.read_text(encoding="utf-8"), "old install")
             self.assertFalse((root / f".{SKILL_NAME}.staging").exists())

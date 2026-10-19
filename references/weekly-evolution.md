@@ -59,4 +59,16 @@ python scripts/query_prompt_library.py --library references/evolving-library --s
 5. **E Repo 與安裝**：repo 位於 `C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\github-release\laoma-aigc-director`。執行 unittest 與 quick_validate；比較安裝版和其 .source-manifest.json，先合併人工客製。`sync_skill.py --replace` 保留舊安裝備份；比較雜湊、實際查詢新ID，再提交本次變更並推送既有GitHub。只改本任務檔案，不納入不相關修改。
 6. **F NAS週報**：檢查 `Y:\Pony's\_AI` 的中文首頁、01_AIGC學習與實作、20_專案導覽、30_主題關聯與50_每週精進，將最有幫助的3至5項（不足不湊數）新增至 `50_每週精進/YYYY-MM-DD 技能精進週報.md` 及目錄，附來源、適用專案、收益、限制、30至60分鐘練習與驗收；同名安全改名，不覆寫人工筆記、不上傳私人文件或憑證。NAS離線只略過此段。
 
+### 雲端主表的寫入路徑（依執行環境）
+
+寫入要用能編輯試算表儲存格的工具。先確認走哪條路，再請使用者授權，避免授權後才發現寫不進去。
+
+| 執行環境 | 寫入方式 | 前提 |
+|---|---|---|
+| Codex app | 內建 Google Drive 連接器的試算表寫入 | 已登入；週日排程走這條 |
+| Claude 桌面版 | 無法直接寫：Drive 連接器不能編輯儲存格、沒有 Sheets 連接器；`codex exec` 預設自動拒絕寫入工具，`--approve-for-me` 會被 Claude 自動模式擋下 | 改走備援 |
+| 備援（任何環境） | 產出與目標分頁表頭一致、可直接貼上的 CSV，加一份給 Codex app 執行的提示詞檔 | 使用者在 Codex app 執行，或手動貼上 |
+
+給 Codex app 的提示詞檔依序寫：寫入前完整快照 → 確認目標分頁最後一個 ID 仍是預期值 → 追加列 → 08_更新日誌加一列 → 完整讀回比對 → 依規則同步公司副本並逐頁核對。Claude 端只做盤點、去重、分類與 CSV／提示詞，不重試會失敗的寫入，交付時寫明「寫入需在 Codex app 完成」。
+
 每次輸出包含批次ID、查核來源、實際新增／更新項數、六個階段各自的狀態、快照版本與驗證結果。只在有實質更新、任一階段失敗、過期風險或需使用者處理時通知；無有用新資訊且全部階段完成時保持安靜。學習測試結果須回寫06並反映到02；待執行計畫不能填成已學會或已驗證。

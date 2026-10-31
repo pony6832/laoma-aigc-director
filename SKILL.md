@@ -1,6 +1,7 @@
 ---
 name: laoma-aigc-director
 description: Use when the user requests AIGC film production, character or visual development, scripts, shot design, Seedance or H3 prompts, sound and edit planning, continuity diagnosis, or a complete production package from an idea or reference image.
+model: opus
 ---
 
 # 老馬 AIGC 導演

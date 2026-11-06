@@ -18,6 +18,8 @@
 - 本地 Skill、版本化快照與案件檔仍依執行需要保存在本機或 Git；它們不是另一個雲端知識庫存放點。若上傳雲端副本，仍必須放入上述根目錄。
 
 ## 日常調用
+電影技法中英對照請查 `25_電影技法中英對照`：MEL-001～MEL-424，13類，保留中英重點描述、雙語可改寫提示詞、來源及實測狀態；用名稱或MEL-ID查詢。`26_來源對照_Melies` 為隱藏溯源頁，不載入日常快照。既有條目參照只表示同名／別名關聯，不宣告完全等價或自動合併；原創整理不等於原站完整PROMPT，來源讀取不等於生成實測。
+
 從Skill根目錄執行，PowerShell設定PYTHONUTF8=1：
 ```powershell
 python scripts/query_prompt_library.py --library references/evolving-library --info
@@ -66,8 +68,17 @@ python scripts/query_prompt_library.py --library references/evolving-library --s
 | 執行環境 | 寫入方式 | 前提 |
 |---|---|---|
 | Codex app | 內建 Google Drive 連接器的試算表寫入 | 已登入；週日排程走這條 |
-| Claude 桌面版 | 無法直接寫：Drive 連接器不能編輯儲存格、沒有 Sheets 連接器；`codex exec` 預設自動拒絕寫入工具，`--approve-for-me` 會被 Claude 自動模式擋下 | 改走備援 |
+| Claude 桌面版（有 Sheets 連接器） | 用 `update_values` 寫明確範圍，不要用 `append_values`（見下方「寫入規則」） | 連接器已載入；先寫個人主表，驗證後再寫公司副本 |
+| Claude 桌面版（無 Sheets 連接器） | 準備 CSV 與一份 UTF-8 提示詞檔，把 `codex.exe exec -C <案子資料夾> --approve-for-me --skip-git-repo-check` 當作**單獨一次** Bash 呼叫送出（提示詞用單行 ASCII，指向提示詞檔），完成後比對 Codex 存下的讀回 JSON | 需要只允許這個固定指令形狀的窄規則；串接指令（mkdir && cp && codex）會被自動模式擋下。規則不在時改走備援 |
 | 備援（任何環境） | 產出與目標分頁表頭一致、可直接貼上的 CSV，加一份給 Codex app 執行的提示詞檔 | 使用者在 Codex app 執行，或手動貼上 |
+
+**寫入規則（加列到既有分頁時）：**
+1. 先讀該分頁的 ID 欄，用最後一個有值的列算出第一個空列，再用 `update_values` 寫到明確範圍。連接器的 `append_values` 自己判斷「表尾」，曾在表頭偵測提早結束時蓋掉 4 列既有資料（VS-045～048）。
+2. 寫完立刻比對回傳的 `updatedRange` 與預期範圍；不一致就停止，從另一份副本復原，不要繼續寫。
+3. 先寫個人主表、驗證後再寫公司副本，讓沒動過的那份當復原來源。兩份表的列位置可能不同（例如 08_更新日誌，副本少一列）：每份各自讀 A 欄找第一個空列，不可沿用主表的列號；寫完讀回上一列與新列。
+4. 去重時，新別名與斜線詞要在**所有可見分頁**搜尋，不只目標分頁；同一個標籤可能在兄弟分頁已存在。
+5. 從本機 CSV 匯入前，先對每個欄位比 LEN() 總和；同步腳本若用 `e.get('en','')` 之類的預設值，會把雲端原有的英文名稱與來源悄悄清空。
+6. 委派給 Codex 寫入時，提示詞結尾必須要求回報：試算表 ID、寫入範圍、讀回列數、最後一列 ID、檔案 modifiedTime。驗證端只看這些證據（modifiedTime 加列範圍），不採信「已完成」的口頭回報。
 
 給 Codex app 的提示詞檔依序寫：寫入前完整快照 → 確認目標分頁最後一個 ID 仍是預期值 → 追加列 → 08_更新日誌加一列 → 完整讀回比對 → 依規則同步公司副本並逐頁核對。Claude 端只做盤點、去重、分類與 CSV／提示詞，不重試會失敗的寫入，交付時寫明「寫入需在 Codex app 完成」。
 

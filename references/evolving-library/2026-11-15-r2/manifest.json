@@ -1,0 +1,108 @@
+{
+  "schema_version": "2.0",
+  "spreadsheet_id": "1E9MrvDlFdCEpLQ8RbARLi8gSomQaYWb25Kxik_xIIdc",
+  "captured_at": "2026-11-15",
+  "version": "2026-11-15-r2",
+  "sheets": [
+    {
+      "name": "00_使用導覽",
+      "file": "sheet-00.json",
+      "sha256": "6ad27eeec9c657181a05ce7e401bcd5d6a44035086a1f229978f3e2e6b8a626c"
+    },
+    {
+      "name": "01_分類與任務",
+      "file": "sheet-01.json",
+      "sha256": "aa0ec24be029a01986c197e97002c3e5f00df957e8f0de0b6d45defcf6639198"
+    },
+    {
+      "name": "02_提示詞總庫",
+      "file": "sheet-02.json",
+      "sha256": "825e1bdac01321c6bf980432fc18f7be2356cd75de8edb4c9a629653184e78bb"
+    },
+    {
+      "name": "03_組合工作流",
+      "file": "sheet-03.json",
+      "sha256": "eab2471181a48d6e09ea1941576098c8b20d26a30532c7c25db2d86ed20f0796"
+    },
+    {
+      "name": "04_模型能力",
+      "file": "sheet-04.json",
+      "sha256": "eb917f7f85888cbe9f8d723ad6cba812aabc10e99c3549f13416012980146d84"
+    },
+    {
+      "name": "05_來源登錄",
+      "file": "sheet-05.json",
+      "sha256": "98a30fdfbb48ef150bb2feccec5a5131838db695c177a2c3e82d29878f8d8b92"
+    },
+    {
+      "name": "06_實測與失敗",
+      "file": "sheet-06.json",
+      "sha256": "c4cb2f2f2d896f3f5df25ff1709c1c6eddfcce487e68f6b046e17de131d825af"
+    },
+    {
+      "name": "07_缺口與待辦",
+      "file": "sheet-07.json",
+      "sha256": "7c14e2b334b2b7eeb779896b19489a311b5f6f606b137630ba9188e6d2d223da"
+    },
+    {
+      "name": "08_更新日誌",
+      "file": "sheet-08.json",
+      "sha256": "b6abcb47251bc882986ab290a03e36e42ad42c835b72025ac4aecef915b8cc1a"
+    },
+    {
+      "name": "09_更新規則",
+      "file": "sheet-09.json",
+      "sha256": "09cbba8ec73b193fca51bf13cf51a635a727d5881b3f8f14b7a181bc9f497d7f"
+    },
+    {
+      "name": "10_學習路線",
+      "file": "sheet-10.json",
+      "sha256": "f52b7c4f66f5fd1d2a0fbeebd0c27d90ab224e6a4792ea091b5ad82de0a11f25"
+    },
+    {
+      "name": "11_導演風格調用",
+      "file": "sheet-11.json",
+      "sha256": "447f50faa4a0ebd7e947b71a427ed4bc8edcfc84f1dbd8b76fb8c79171df8914"
+    },
+    {
+      "name": "12_電影鏡頭基礎",
+      "file": "sheet-12.json",
+      "sha256": "03c1592b555ea38414f3d85a860750eb15783bbd437dc796918bfdf7aefbecc9"
+    },
+    {
+      "name": "13_視覺提示詞分類",
+      "file": "sheet-13.json",
+      "sha256": "0191c773792eabb4497525e1317c031a49e6c5d5d6308169faf6b62bc83c7496"
+    },
+    {
+      "name": "14_視覺風格庫",
+      "file": "sheet-14.json",
+      "sha256": "c91fa22958599460048b291838a547bce1c02ffca452300a7cb3c8f4a9f9484b"
+    },
+    {
+      "name": "17_Google影像影片產品",
+      "file": "sheet-15.json",
+      "sha256": "cb6388dbb4d856ea9e0e3b822587da3c2da2ae1eff8cee4dff4fe94e862050a8"
+    },
+    {
+      "name": "19_IG社群提示詞索引",
+      "file": "sheet-16.json",
+      "sha256": "508620419469748037529ec48c490278075b529b84238ba02f7bade201b91257"
+    },
+    {
+      "name": "22_電影配樂與AI音樂",
+      "file": "sheet-17.json",
+      "sha256": "fe0bc05555995180a27bb2a4dfa1d89e949ce971f40faa7f3854ba6fa6c1b1c6"
+    },
+    {
+      "name": "24_動態效果圖鑑",
+      "file": "sheet-18.json",
+      "sha256": "4077120af2d0ba22be7586b54cfdc178f987b9d49c837390faecdab166c3f314"
+    },
+    {
+      "name": "25_電影技法中英對照",
+      "file": "sheet-19.json",
+      "sha256": "81f31b91649886703da10d383e93264b54fa2a949a15ee3ea7b56cba56556794"
+    }
+  ]
+}

@@ -59,7 +59,7 @@ python scripts/query_prompt_library.py --library references/evolving-library --s
    ```
    匯出器只收可見分頁、保留中間空列與原始列號，並自動偵測表頭列（19、22 頁表頭在第3列）。重複ID、來源缺失或已存在版本會失敗；舊快照保留，成功後才切換 active.json。最後以 `--info` 確認版本、日期與分頁數與雲端一致。
 5. **E Repo 與安裝**：repo 位於 `C:\Users\pony6832\Documents\Codex\Codex專案分類\08 - AIGC影像生成相關\github-release\laoma-aigc-director`。執行 unittest 與 quick_validate；比較安裝版和其 .source-manifest.json，先合併人工客製。`sync_skill.py --replace` 保留舊安裝備份；比較雜湊、實際查詢新ID，再提交本次變更並推送既有GitHub。只改本任務檔案，不納入不相關修改。
-6. **F NAS週報**：檢查 `Y:\Pony's\_AI` 的中文首頁、01_AIGC學習與實作、20_專案導覽、30_主題關聯與50_每週精進，將最有幫助的3至5項（不足不湊數）新增至 `50_每週精進/YYYY-MM-DD 技能精進週報.md` 及目錄，附來源、適用專案、收益、限制、30至60分鐘練習與驗收；同名安全改名，不覆寫人工筆記、不上傳私人文件或憑證。NAS離線只略過此段。
+6. **F NAS週報**（2026-11-22 起寫入新庫）：檢查 `Y:\Pony's\老馬知識庫_V2` 的 00_開始這裡、20_學習拆解、30_方法與知識、40_實作專案與50_週回顧，將最有幫助的3至5項（不足不湊數）新增至 `50_週回顧/YYYY-MM-DD 技能精進週報.md`，並在 `50_週回顧/週回顧總表.md` 的「技能精進週報」表新增一列連結（`[[YYYY-MM-DD 技能精進週報]]`＋一句話）。檔案最上面必須有 frontmatter：`type: 週回顧`、`tags: [週回顧, 技能精進]`、`week: YYYY-Www`、`created: YYYY-MM-DD`。每項附來源、適用專案、收益、限制、30至60分鐘練習與驗收；同名安全改名，不覆寫人工筆記（含 `YYYY-Www 週回顧.md`，那是人工週回顧）、不上傳私人文件或憑證。NAS離線只略過此段。舊庫 `Y:\Pony's\_AI` 自 2026-11-22 起不再寫入週報，既有週報留在原處。
 
 ### 雲端主表的寫入路徑（依執行環境）
 

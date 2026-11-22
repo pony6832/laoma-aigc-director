@@ -70,6 +70,8 @@ Gate 3 核准的是方案，不代表每一次送出時的設定都正確。每�
 - 停止條件：缺少實體輸出、雜湊不符、任何 QC 未通過、輸出規格不符、權利阻擋或核准被撤回。
 - 若 Gate 3 鎖定了導演風格：另以 `assets/director-style-review-template.md` 記錄 timecode 證據與判定；`STYLE_LOCK_PASS` 只代表風格軸通過，不能取代其餘 Gate 4 QC。
 
+多版本案件（V01、V02、V03…）的收尾：每出一個新交付版本，就把被取代的輸出與核准範圍移到版本化歷史報告，`asset_status.outputs` 與 `approval.scope` 只留現行版本；交付成片若放在 `08_edit_and_delivery/`，在 `06_generated_assets/` 建硬連結後登記。這樣最後標 `complete` 只要改一次，不必在結案時重整狀態檔（2026-11-15 一支三版 MV 結案時驗證器分四輪才通過）。
+
 工具不可操作時可以交付完整可執行生成／剪輯包，但案件停在 Gate 3 或 Gate 4 `blocked`，不可標為 `complete`。
 
 ## 更新與驗證
